@@ -21,46 +21,46 @@ public class AddOperationMethodTest {
 
 	@Before
 	public void setUp() {
-		this.sibs = new Sibs(3, new Services());
+		sibs = new Sibs(3, new Services());
 	}
 
 	@Test
 	public void success() throws OperationException, SibsException {
-		int position = this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
+		int position = sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
 
-		Operation operation = this.sibs.getOperation(position);
+		Operation operation = sibs.getOperation(position);
 
-		assertEquals(1, this.sibs.getNumberOfOperations());
+		assertEquals(1, sibs.getNumberOfOperations());
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals(VALUE, operation.getValue());
 	}
 
 	@Test
 	public void successWithDelete() throws OperationException, SibsException {
-		int position = this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
-		this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
-		this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
-		this.sibs.removeOperation(position);
-		position = this.sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, 200);
+		int position = sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		sibs.removeOperation(position);
+		position = sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, 200, "completed");
 
-		Operation operation = this.sibs.getOperation(position);
+		Operation operation = sibs.getOperation(position);
 
-		assertEquals(3, this.sibs.getNumberOfOperations());
+		assertEquals(3, sibs.getNumberOfOperations());
 		assertEquals(Operation.OPERATION_PAYMENT, operation.getType());
 		assertEquals(200, operation.getValue());
 	}
 
 	@Test(expected = SibsException.class)
 	public void failIsFull() throws OperationException, SibsException {
-		this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
-		this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
-		this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
-		this.sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
 	}
 
 	@After
 	public void tearDown() {
-		this.sibs = null;
+		sibs = null;
 	}
 
 }

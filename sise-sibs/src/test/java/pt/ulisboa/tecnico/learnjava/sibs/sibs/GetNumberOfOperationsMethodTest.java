@@ -20,20 +20,20 @@ public class GetNumberOfOperationsMethodTest {
 
 	@Before
 	public void setUp() throws OperationException, SibsException {
-		this.sibs = new Sibs(3, new Services());
-		this.sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE);
+		sibs = new Sibs(3, new Services());
+		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE, "completed");
 	}
 
 	@Test
 	public void success() throws SibsException, OperationException {
-		this.sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE);
+		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE, "completed");
 
-		assertEquals(2, this.sibs.getNumberOfOperations());
+		assertEquals(2, sibs.getNumberOfOperations());
 	}
 
 	@After
 	public void tearDown() {
-		this.sibs = null;
+		sibs = null;
 	}
 
 }

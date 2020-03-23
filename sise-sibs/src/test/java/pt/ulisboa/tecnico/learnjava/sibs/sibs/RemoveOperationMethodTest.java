@@ -20,30 +20,30 @@ public class RemoveOperationMethodTest {
 
 	@Before
 	public void setUp() throws OperationException, SibsException {
-		this.sibs = new Sibs(3, new Services());
-		this.sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE);
+		sibs = new Sibs(3, new Services());
+		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE, "completed");
 	}
 
 	@Test
 	public void success() throws SibsException {
-		this.sibs.removeOperation(0);
+		sibs.removeOperation(0);
 
-		assertEquals(0, this.sibs.getNumberOfOperations());
+		assertEquals(0, sibs.getNumberOfOperations());
 	}
 
 	@Test(expected = SibsException.class)
 	public void negativePosition() throws SibsException {
-		this.sibs.removeOperation(-1);
+		sibs.removeOperation(-1);
 	}
 
 	@Test(expected = SibsException.class)
 	public void positionAboveLength() throws SibsException {
-		this.sibs.removeOperation(4);
+		sibs.removeOperation(4);
 	}
 
 	@After
 	public void tearDown() {
-		this.sibs = null;
+		sibs = null;
 	}
 
 }

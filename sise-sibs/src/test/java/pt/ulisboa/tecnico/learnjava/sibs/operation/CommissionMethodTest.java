@@ -17,14 +17,14 @@ public class CommissionMethodTest {
 	public void transferOperation1000() throws OperationException {
 		Operation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, 1000);
 
-		assertEquals(51, operation.commission());
+		assertEquals(101, operation.commission());
 	}
 
 	@Test
 	public void transferOperation15() throws OperationException {
 		Operation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, 15);
 
-		assertEquals(2, operation.commission());
+		assertEquals(3, operation.commission());
 	}
 
 	@Test

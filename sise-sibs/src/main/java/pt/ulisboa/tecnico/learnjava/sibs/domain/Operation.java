@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.learnjava.sibs.domain;
 
+import pt.ulisboa.tecnico.learnjava.bank.exceptions.AccountException;
+import pt.ulisboa.tecnico.learnjava.bank.services.Services;
 import pt.ulisboa.tecnico.learnjava.sibs.exceptions.OperationException;
+import pt.ulisboa.tecnico.learnjava.sibs.exceptions.SibsException;
 
 public abstract class Operation {
 	public static final String OPERATION_TRANSFER = "transfer";
@@ -19,6 +22,7 @@ public abstract class Operation {
 		if (type == null || !type.equals(OPERATION_TRANSFER) && !type.equals(OPERATION_PAYMENT)) {
 			throw new OperationException(type);
 		}
+
 		if (value <= 0) {
 			throw new OperationException(value);
 		}
@@ -29,11 +33,26 @@ public abstract class Operation {
 	}
 
 	public String getType() {
-		return this.type;
+		return type;
 	}
 
 	public int getValue() {
-		return this.value;
+		return value;
 	}
 
+	public String getState() {
+		return null;
+	}
+
+	public String cancel() {
+		return null;
+	}
+
+	public void setState(String state) {
+
+	}
+
+	public String Process(Services services) throws OperationException, AccountException, SibsException {
+		return null;
+	}
 }
