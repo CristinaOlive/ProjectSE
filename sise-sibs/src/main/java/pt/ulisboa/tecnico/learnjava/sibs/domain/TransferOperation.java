@@ -23,19 +23,16 @@ public class TransferOperation extends Operation {
 		state = new setState(stateTransfer);
 	}
 
-	@Override
 	public String getState() {
 		return stateTransfer;
 	}
 
-	@Override
 	public void setState(String state) {
 		if(!stateTransfer.equals("error")) {
 			stateTransfer = state;
 		}
 	}
 
-	@Override
 	public String Process(Services services) throws AccountException, SibsException, OperationException {
 		state.setCurrentstate(stateTransfer);
 		try {

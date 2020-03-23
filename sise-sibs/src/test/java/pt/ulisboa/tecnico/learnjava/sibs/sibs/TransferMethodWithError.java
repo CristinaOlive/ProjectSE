@@ -17,6 +17,7 @@ import pt.ulisboa.tecnico.learnjava.bank.exceptions.BankException;
 import pt.ulisboa.tecnico.learnjava.bank.exceptions.ClientException;
 import pt.ulisboa.tecnico.learnjava.bank.services.Services;
 import pt.ulisboa.tecnico.learnjava.sibs.domain.Sibs;
+import pt.ulisboa.tecnico.learnjava.sibs.domain.TransferOperation;
 import pt.ulisboa.tecnico.learnjava.sibs.exceptions.OperationException;
 import pt.ulisboa.tecnico.learnjava.sibs.exceptions.SibsException;
 
@@ -37,7 +38,6 @@ public class TransferMethodWithError {
 		when(services.checkAccount(sourceIban)).thenReturn(true);
 
 		when(services.deposit(targetIban, 100)).thenThrow(AccountException.class);
-
 		try {
 			sibs.transfer(sourceIban, targetIban, 100);
 			fail();
@@ -45,7 +45,8 @@ public class TransferMethodWithError {
 			verify(services, never()).withdraw(sourceIban, 111);
 			verify(services, times(4)).deposit(targetIban, 100);
 			assertEquals(1, sibs.getNumberOfOperations());
-			assertEquals("error", sibs.getOperation(0).getState());
+			TransferOperation op = (TransferOperation) sibs.getOperation(0);
+			assertEquals("error", op.getState());
 		}
 	}
 
