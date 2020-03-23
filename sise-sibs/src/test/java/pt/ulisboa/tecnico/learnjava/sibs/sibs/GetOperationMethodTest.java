@@ -20,32 +20,32 @@ public class GetOperationMethodTest {
 
 	@Before
 	public void setUp() throws OperationException, SibsException {
-		sibs = new Sibs(3, new Services());
-		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE, "completed");
+		this.sibs = new Sibs(3, new Services());
+		this.sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE);
 	}
 
 	@Test
 	public void success() throws SibsException {
-		Operation operation = sibs.getOperation(0);
+		Operation operation = this.sibs.getOperation(0);
 
-		assertEquals(1, sibs.getNumberOfOperations());
+		assertEquals(1, this.sibs.getNumberOfOperations());
 		assertEquals(Operation.OPERATION_PAYMENT, operation.getType());
 		assertEquals(VALUE, operation.getValue());
 	}
 
 	@Test(expected = SibsException.class)
 	public void negativePosition() throws SibsException {
-		sibs.getOperation(-1);
+		this.sibs.getOperation(-1);
 	}
 
 	@Test(expected = SibsException.class)
 	public void positionAboveLength() throws SibsException {
-		sibs.getOperation(4);
+		this.sibs.getOperation(4);
 	}
 
 	@After
 	public void tearDown() {
-		sibs = null;
+		this.sibs = null;
 	}
 
 }
