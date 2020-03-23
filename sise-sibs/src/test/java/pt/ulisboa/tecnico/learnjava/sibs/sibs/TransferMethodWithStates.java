@@ -14,6 +14,7 @@ import pt.ulisboa.tecnico.learnjava.bank.exceptions.ClientException;
 import pt.ulisboa.tecnico.learnjava.bank.services.Services;
 import pt.ulisboa.tecnico.learnjava.sibs.domain.Operation;
 import pt.ulisboa.tecnico.learnjava.sibs.domain.Sibs;
+import pt.ulisboa.tecnico.learnjava.sibs.domain.TransferOperation;
 import pt.ulisboa.tecnico.learnjava.sibs.exceptions.OperationException;
 import pt.ulisboa.tecnico.learnjava.sibs.exceptions.SibsException;
 
@@ -54,7 +55,8 @@ public class TransferMethodWithStates {
 		assertEquals(100, sibs.getTotalValueOfOperations());
 		assertEquals(100, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_TRANSFER));
 		assertEquals(0, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_PAYMENT));
-		assertEquals("completed", sibs.getOperation(0).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		assertEquals("completed", ope.getState());
 	}
 
 	@Test
@@ -63,7 +65,8 @@ public class TransferMethodWithStates {
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
 		Operation op = sibs.transfer(sourceIban, targetIban, 100);
 		sibs.changeOperation(0, "registered");
-		assertEquals("registered", sibs.getOperation(0).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		assertEquals("registered", ope.getState());
 	}
 
 	@Test
@@ -72,7 +75,8 @@ public class TransferMethodWithStates {
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
 		Operation op = sibs.transfer(sourceIban, targetIban, 100);
 		sibs.changeOperation(0, "deposited");
-		assertEquals("deposited", sibs.getOperation(0).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		assertEquals("deposited", ope.getState());
 	}
 
 	@Test
@@ -83,13 +87,16 @@ public class TransferMethodWithStates {
 		sibs.changeOperation(0, "deposited");
 		sibs.transfer(sourceIban, targetIban, 200);
 		sibs.transfer(sourceIban, targetIban, 400);
-		assertEquals("deposited", sibs.getOperation(0).getState());
-		assertEquals("completed", sibs.getOperation(1).getState());
-		assertEquals("completed", sibs.getOperation(2).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		TransferOperation ope2 = (TransferOperation) sibs.getOperation(1);
+		TransferOperation ope3 = (TransferOperation) sibs.getOperation(2);
+		assertEquals("deposited", ope.getState());
+		assertEquals("completed", ope2.getState());
+		assertEquals("completed", ope3.getState());
 		int totalNotFinished = sibs.processOperation();
 		assertEquals(3, sibs.getNumberOfOperations());
 		assertEquals(1, totalNotFinished);
-		assertEquals("completed", sibs.getOperation(0).getState());
+		assertEquals("completed", ope.getState());
 	}
 
 	@Test
@@ -100,13 +107,16 @@ public class TransferMethodWithStates {
 		sibs.changeOperation(0, "withdrawn");
 		sibs.transfer(sourceIban, targetIban, 200);
 		sibs.transfer(sourceIban, targetIban, 400);
-		assertEquals("withdrawn", sibs.getOperation(0).getState());
-		assertEquals("completed", sibs.getOperation(1).getState());
-		assertEquals("completed", sibs.getOperation(2).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		TransferOperation ope2 = (TransferOperation) sibs.getOperation(1);
+		TransferOperation ope3 = (TransferOperation) sibs.getOperation(2);
+		assertEquals("withdrawn", ope.getState());
+		assertEquals("completed", ope2.getState());
+		assertEquals("completed", ope3.getState());
 		int totalNotFinished = sibs.processOperation();
 		assertEquals(3, sibs.getNumberOfOperations());
 		assertEquals(1, totalNotFinished);
-		assertEquals("completed", sibs.getOperation(0).getState());
+		assertEquals("completed", ope.getState());
 	}
 
 	@Test
@@ -117,13 +127,16 @@ public class TransferMethodWithStates {
 		sibs.changeOperation(0, "registered");
 		sibs.transfer(sourceIban, targetIban, 200);
 		sibs.transfer(sourceIban, targetIban, 400);
-		assertEquals("registered", sibs.getOperation(0).getState());
-		assertEquals("completed", sibs.getOperation(1).getState());
-		assertEquals("completed", sibs.getOperation(2).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		TransferOperation ope2 = (TransferOperation) sibs.getOperation(1);
+		TransferOperation ope3 = (TransferOperation) sibs.getOperation(2);
+		assertEquals("registered", ope.getState());
+		assertEquals("completed", ope2.getState());
+		assertEquals("completed", ope3.getState());
 		int totalNotFinished = sibs.processOperation();
 		assertEquals(3, sibs.getNumberOfOperations());
 		assertEquals(1, totalNotFinished);
-		assertEquals("completed", sibs.getOperation(0).getState());
+		assertEquals("completed", ope.getState());
 	}
 
 	@Test
@@ -133,7 +146,8 @@ public class TransferMethodWithStates {
 		Operation op = sibs.transfer(sourceIban, targetIban, 100);
 		sibs.changeOperation(0, "registered");
 		sibs.cancelOperation(0);
-		assertEquals("cancelled", sibs.getOperation(0).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		assertEquals("cancelled", ope.getState());
 	}
 
 	@Test
@@ -143,7 +157,8 @@ public class TransferMethodWithStates {
 		Operation op = sibs.transfer(sourceIban, targetIban, 100);
 		sibs.changeOperation(0, "deposited");
 		sibs.cancelOperation(0);
-		assertEquals("cancelled", sibs.getOperation(0).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		assertEquals("cancelled", ope.getState());
 	}
 
 	@Test
@@ -153,7 +168,8 @@ public class TransferMethodWithStates {
 		Operation op = sibs.transfer(sourceIban, targetIban, 100);
 		sibs.changeOperation(0, "withdrawn");
 		sibs.cancelOperation(0);
-		assertEquals("cancelled", sibs.getOperation(0).getState());
+		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
+		assertEquals("cancelled", ope.getState());
 	}
 
 	@After

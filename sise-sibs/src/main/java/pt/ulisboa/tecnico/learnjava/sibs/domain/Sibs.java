@@ -16,7 +16,7 @@ public class Sibs {
 
 	public Operation transfer(String sourceIban, String targetIban, int amount)
 			throws SibsException, AccountException, OperationException {
-		Operation operation = new TransferOperation(sourceIban, targetIban, amount);
+		TransferOperation operation = new TransferOperation(sourceIban, targetIban, amount);
 		String state;
 		int j = 0;
 		try {
@@ -52,7 +52,8 @@ public class Sibs {
 		Operation operation;
 		if (type.equals(Operation.OPERATION_TRANSFER)) {
 			operation = new TransferOperation(sourceIban, targetIban, value);
-			operation.setState(state);
+			TransferOperation op = (TransferOperation) operation;
+			op.setState(state);
 		} else {
 			operation = new PaymentOperation(targetIban, value);
 		}
@@ -79,7 +80,8 @@ public class Sibs {
 		if (position < 0 || position > operations.length) {
 			throw new SibsException();
 		}
-		getOperation(position).setState(state);
+		TransferOperation op = (TransferOperation) getOperation(position);
+		op.setState(state);
 	}
 
 	public int getNumberOfOperations() {
@@ -116,22 +118,23 @@ public class Sibs {
 		int result = 0;
 		String state;
 		for (int i = 0; i < operations.length; i++) {
-			if (operations[i] != null) {
-				if(operations[i].getState()=="registered") {
-					operations[i].Process(services);
-					operations[i].Process(services);
-					state = operations[i].Process(services);
+			TransferOperation op = (TransferOperation) operations[i];
+			if (op != null) {
+				if(op.getState()=="registered") {
+					op.Process(services);
+					op.Process(services);
+					state = op.Process(services);
 					changeOperation(i, state);
 					result++;
 				}
-				if(operations[i].getState()=="deposited") {
-					operations[i].Process(services);
-					state = operations[i].Process(services);
+				if(op.getState()=="deposited") {
+					op.Process(services);
+					state = op.Process(services);
 					changeOperation(i, state);
 					result++;
 				}
-				if(operations[i].getState()=="withdrawn") {
-					state = operations[i].Process(services);
+				if(op.getState()=="withdrawn") {
+					state = op.Process(services);
 					changeOperation(i, state);
 					result++;
 				}
