@@ -29,8 +29,8 @@ public class Sibs {
 			state = operation.Process(services);
 			addOperation(Operation.OPERATION_TRANSFER, sourceIban, targetIban, amount, state);
 			return operation;
-		} catch (AccountException e) {
-			state = operation.retry();
+		} catch (OperationException e) {
+			state = "error";
 			addOperation(Operation.OPERATION_TRANSFER, sourceIban, targetIban, amount, state);
 			throw new SibsException();
 		}
@@ -112,7 +112,7 @@ public class Sibs {
 		return result;
 	}
 
-	public int processOperation() throws AccountException, SibsException {
+	public int processOperation() throws AccountException, SibsException, OperationException {
 		int result = 0;
 		String state;
 		for (int i = 0; i < operations.length; i++) {

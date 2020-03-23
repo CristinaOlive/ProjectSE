@@ -9,6 +9,7 @@ public class TransferOperation extends Operation {
 	private final String sourceIban;
 	private final String targetIban;
 	String stateTransfer;
+	setState state;
 
 	public TransferOperation(String sourceIban, String targetIban, int value) throws OperationException {
 		super(Operation.OPERATION_TRANSFER, value);
@@ -19,6 +20,7 @@ public class TransferOperation extends Operation {
 		this.sourceIban = sourceIban;
 		this.targetIban = targetIban;
 		stateTransfer="";
+		state = new setState(stateTransfer);
 	}
 
 	@Override
@@ -34,12 +36,21 @@ public class TransferOperation extends Operation {
 	}
 
 	@Override
-	public String Process(Services services) throws AccountException, SibsException {
-		if(!stateTransfer.equals("error")) {
-			setState state = new setState(stateTransfer);
-			stateTransfer = state.pull(this, services);
-			return stateTransfer;
-		} else {
+	public String Process(Services services) throws AccountException, SibsException, OperationException {
+		state.setCurrentstate(stateTransfer);
+		try {
+			if(!stateTransfer.equals("error")) {
+				stateTransfer = state.pull(this, services);
+				return stateTransfer;
+			} else {
+				return stateTransfer;
+			}
+		} catch (AccountException e) {
+			if(state.retry().equals("retry")) {
+				stateTransfer = Process(services);
+			} else {
+				throw new OperationException();
+			}
 			return stateTransfer;
 		}
 	}
@@ -49,13 +60,6 @@ public class TransferOperation extends Operation {
 		if(!stateTransfer.equals("completed") && !stateTransfer.equals("error")) {
 			stateTransfer = "cancelled";
 		}
-		return stateTransfer;
-	}
-
-	@Override
-	public String retry() throws AccountException, SibsException {
-		setState state = new setState(stateTransfer);
-		stateTransfer = state.retry();
 		return stateTransfer;
 	}
 
