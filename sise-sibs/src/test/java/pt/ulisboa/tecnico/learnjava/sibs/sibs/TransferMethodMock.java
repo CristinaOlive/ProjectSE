@@ -35,7 +35,7 @@ public class TransferMethodMock {
 			fail();
 		} catch (SibsException e) {
 			verify(services, never()).withdraw(sourceIban, 111);
-			verify(services, times(1)).deposit(targetIban, 100);
+			verify(services, times(4)).deposit(targetIban, 100);
 			assertEquals(1, sibs.getNumberOfOperations());
 		}
 	}
@@ -58,7 +58,7 @@ public class TransferMethodMock {
 			fail();
 		} catch (SibsException e) {
 			verify(services, never()).withdraw(sourceIban, 100);
-			verify(services, times(1)).deposit(targetIban, 100);
+			verify(services, times(4)).deposit(targetIban, 100);
 			assertEquals(1, sibs.getNumberOfOperations());
 		}
 	}

@@ -10,8 +10,25 @@ public interface State {
 
 class setState {
 	private State currentState;
+	private int tries;
 
 	public setState(String state) {
+		tries = 3;
+		if(state.isEmpty()) {
+			currentState = new Registered();
+		}
+		if(state.equals("registered")) {
+			currentState = new Deposited();
+		}
+		if(state.equals("deposited")) {
+			currentState = new Withdraw();
+		}
+		if(state.equals("withdrawn")) {
+			currentState = new Completed();
+		}
+	}
+
+	public void setCurrentstate(String state) {
 		if(state.isEmpty()) {
 			currentState = new Registered();
 		}
@@ -42,7 +59,6 @@ class setState {
 
 	public String retry() throws AccountException, SibsException {
 		String state;
-		int tries = 3;
 		if(0 < tries) {
 			state = "retry";
 			tries--;

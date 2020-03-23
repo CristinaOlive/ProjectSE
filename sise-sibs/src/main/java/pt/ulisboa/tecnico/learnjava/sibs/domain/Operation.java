@@ -52,13 +52,7 @@ public abstract class Operation {
 
 	}
 
-	public String Process(Services services) throws AccountException, SibsException {
+	public String Process(Services services) throws OperationException, AccountException, SibsException {
 		return null;
 	}
-
-	public String retry() throws AccountException, SibsException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
