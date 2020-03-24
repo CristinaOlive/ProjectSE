@@ -2,10 +2,11 @@ package pt.ulisboa.tecnico.learnjava.sibs.domain;
 
 import pt.ulisboa.tecnico.learnjava.bank.exceptions.AccountException;
 import pt.ulisboa.tecnico.learnjava.bank.services.Services;
+import pt.ulisboa.tecnico.learnjava.sibs.exceptions.OperationException;
 import pt.ulisboa.tecnico.learnjava.sibs.exceptions.SibsException;
 
 public interface State {
-	String process(setState wrapper, TransferOperation wrapper2, Services services) throws AccountException, SibsException;
+	String process(setState wrapper, TransferOperation wrapper2, Services services) throws AccountException, SibsException, OperationException;
 }
 
 class setState {
@@ -47,13 +48,13 @@ class setState {
 		currentState = s;
 	}
 
-	public String pull(TransferOperation wrapper2, Services services) throws AccountException, SibsException {
+	public String pull(TransferOperation wrapper2, Services services) throws AccountException, SibsException, OperationException {
 		String state;
 		try {
 			state = currentState.process(this, wrapper2, services);
 			return state;
 		} catch(AccountException e) {
-			throw new AccountException();
+			throw new OperationException();
 		}
 	}
 
@@ -79,21 +80,21 @@ class Registered implements State {
 
 class Deposited implements State {
 	@Override
-	public String process(setState wrapper, TransferOperation wrapper2, Services services) throws AccountException, SibsException {
+	public String process(setState wrapper, TransferOperation wrapper2, Services services) throws AccountException, SibsException, OperationException {
 		try {
 			if(!services.deposit(wrapper2.getTargetIban(), wrapper2.getValue())) {
 				wrapper.set_state(new Withdraw());
 			} 
 			return "deposited";
 		} catch (AccountException e) {
-			throw new AccountException();
+			throw new OperationException();
 		}
 	}
 }
 
 class Withdraw implements State {
 	@Override
-	public String process(setState wrapper, TransferOperation wrapper2, Services services) throws AccountException, SibsException {
+	public String process(setState wrapper, TransferOperation wrapper2, Services services) throws AccountException, SibsException, OperationException {
 		try {
 			if(services.checkSameBank(wrapper2.getSourceIban(), wrapper2.getTargetIban())) {
 				services.withdraw(wrapper2.getSourceIban(), wrapper2.getValue());
@@ -104,7 +105,7 @@ class Withdraw implements State {
 			return "withdrawn";
 		}catch (AccountException e) {
 			services.deposit(wrapper2.getTargetIban(), wrapper2.getValue());
-			throw new AccountException();
+			throw new OperationException();
 		}
 	}
 }

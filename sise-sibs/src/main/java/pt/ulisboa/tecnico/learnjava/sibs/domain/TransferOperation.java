@@ -42,7 +42,7 @@ public class TransferOperation extends Operation {
 			} else {
 				return stateTransfer;
 			}
-		} catch (AccountException e) {
+		} catch (OperationException e) {
 			stateTransfer = state.retry();
 			if(stateTransfer.equals("retry")) {
 				stateTransfer = Process(services);
