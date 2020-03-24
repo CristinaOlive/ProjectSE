@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/ProjectSE.iml" filepath="$PROJECT_DIR$/.idea/ProjectSE.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sise-bank/sise-bank.iml" filepath="$PROJECT_DIR$/sise-bank/sise-bank.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sise-sibs/sise-sibs.iml" filepath="$PROJECT_DIR$/sise-sibs/sise-sibs.iml" />
+    </modules>
+  </component>
+</project>
