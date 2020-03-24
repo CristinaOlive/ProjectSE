@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import CLI.exceptions.BillAmountException;
+import CLI.exceptions.CodeConfirmationException;
+import CLI.exceptions.OverdraftException;
+import CLI.exceptions.TooFriendlyException;
+import CLI.exceptions.TooShyException;
+import CLI.exceptions.UnregisteredNumberException;
 import pt.ulisboa.tecnico.learnjava.bank.exceptions.AccountException;
 import pt.ulisboa.tecnico.learnjava.bank.services.Services;
 import pt.ulisboa.tecnico.learnjava.sibs.domain.Sibs;
@@ -43,22 +49,31 @@ public class MBWay {
 	 * Confirms the last inserted association with an input with the following
 	 * style: confirm-mbway <Code>
 	 */
-	public void confirmMBWay(int code) {
+	public void confirmMBWay(int code) throws CodeConfirmationException {
+		if (!(getTempX() == code)) {
+			throw new CodeConfirmationException();
+		}
 		MBWay.put(this.temp.y.phoneNumber, this.temp.y.IBAN);
 		this.temp.x = null;
 		this.temp.y = null;
 	}
 
-	/* Transfers money from one account to the other */
-	public void transferMBWay(String sourceNumber, String targetNumber, int amount)
-			throws SibsException, AccountException, OperationException {
-		try {
-			String sourceIBAN = MBWay.get(sourceNumber);
-			String targetIBAN = MBWay.get(targetNumber);
-			this.sibs.transfer(sourceIBAN, targetIBAN, amount);
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+	/*
+	 * Transfers money from one account to the other, throws two important
+	 * exceptions that help the splitbill method not be overloaded with if
+	 * statements
+	 */
+	public void transferMBWay(String sourceNumber, String targetNumber, int amount) throws AccountException,
+			OverdraftException, UnregisteredNumberException, SibsException, OperationException {
+		String sourceIBAN = MBWay.get(sourceNumber);
+		String targetIBAN = MBWay.get(targetNumber);
+		if (!isNumRegist(sourceNumber) || !isNumRegist(targetNumber)) {
+			throw new UnregisteredNumberException();
 		}
+		if (getBalanceByIBAN(sourceIBAN) < amount) {
+			throw new OverdraftException();
+		}
+		this.sibs.transfer(sourceIBAN, targetIBAN, amount);
 	}
 
 	/*
@@ -72,9 +87,21 @@ public class MBWay {
 	 * loggedinuser> || decisiontest <sourceNumber-friend that is paying> <amount to
 	 * be paid by current friend> || decisiontest <sourceNumber-friend that is
 	 * paying> <amount to be paid by current friend> || (...) || end
+	 *
+	 * --> Transfer
 	 */
-	public void splitBill(List<Tuple<String, Integer>> instructions)
-			throws SibsException, AccountException, OperationException {
+	public void splitBill(List<Tuple<String, Integer>> instructions, int numFriends, int total)
+			throws UnregisteredNumberException, AccountException, OverdraftException, TooFriendlyException,
+			SibsException, OperationException, TooShyException, BillAmountException {
+		if (instructions.size() - 1 > numFriends) {
+			throw new TooFriendlyException();
+		}
+		if (instructions.size() - 1 < numFriends) {
+			throw new TooShyException();
+		}
+		if (sumAllAccount(instructions) != total) {
+			throw new BillAmountException();
+		}
 		String targetNumber = instructions.get(0).x;
 		int amountuser1 = instructions.get(0).y;
 		transferMBWay(this.phoneNumber, targetNumber, amountuser1);
@@ -88,6 +115,16 @@ public class MBWay {
 	/* Auxiliary methods: */
 
 	/* ------------------------------------------------------- */
+
+	/* Finds the total value of all payment instructions */
+	public int sumAllAccount(List<Tuple<String, Integer>> instructions) {
+		int total = 0;
+		for (Tuple<String, Integer> tuple : instructions) {
+			int amount = tuple.y;
+			total += amount;
+		}
+		return total;
+	}
 
 	// Getters & Setters & Verifiers below:
 
@@ -115,8 +152,14 @@ public class MBWay {
 		return MBWay.containsKey(phoneNumber);
 	}
 
-	public int getBalanceByIBAN(String IBAN) {
-		return this.services.getAccountByIban(IBAN).getBalance();
+	public int getBalanceByIBAN(String IBAN) throws AccountException {
+		try {
+			int balance = this.services.getAccountByIban(IBAN).getBalance();
+			return balance;
+		} catch (AccountException ex) {
+			System.out.println(ex.getMessage());
+		}
+		return 0;
 	}
 
 	public String getIBANByPhoneNumber(String phoneNumber) {
