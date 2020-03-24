@@ -21,8 +21,8 @@ public class GetTotalValueOfOperationsForTypeMethodTest {
 	@Before
 	public void setUp() throws OperationException, SibsException {
 		sibs = new Sibs(3, new Services());
-		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, 100, "completed");
-		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, 200, "completed");
+		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, 100);
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, 200);
 	}
 
 	@Test

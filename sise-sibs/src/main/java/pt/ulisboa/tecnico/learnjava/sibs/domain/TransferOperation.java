@@ -19,7 +19,7 @@ public class TransferOperation extends Operation {
 		}
 		this.sourceIban = sourceIban;
 		this.targetIban = targetIban;
-		stateTransfer="";
+		stateTransfer="registered";
 		state = new setState(stateTransfer);
 	}
 
@@ -43,7 +43,8 @@ public class TransferOperation extends Operation {
 				return stateTransfer;
 			}
 		} catch (AccountException e) {
-			if(state.retry().equals("retry")) {
+			stateTransfer = state.retry();
+			if(stateTransfer.equals("retry")) {
 				stateTransfer = Process(services);
 			} else {
 				throw new OperationException();

@@ -32,7 +32,8 @@ public class sucessTransferMock {
 		when(services.checkAccount(sourceIban)).thenReturn(true);
 
 		sibs.transfer(sourceIban, targetIban, 100);
-
+		sibs.processOperation();
+		sibs.processOperation();
 		verify(services).withdraw(sourceIban,111);
 		verify(services).deposit(targetIban, 100);
 		assertEquals(1, sibs.getNumberOfOperations());
@@ -90,6 +91,8 @@ public class sucessTransferMock {
 
 		sibs.transfer(sourceIban, targetIban, 100);
 
+		sibs.processOperation();
+		sibs.processOperation();
 		verify(services).withdraw(sourceIban,100);
 		verify(services).deposit(targetIban, 100);
 		assertEquals(1, sibs.getNumberOfOperations());
@@ -110,7 +113,8 @@ public class sucessTransferMock {
 		when(services.checkSameBank(sourceIban, targetIban)).thenReturn(false);
 
 		sibs.transfer(sourceIban, targetIban, 100);
-
+		sibs.processOperation();
+		sibs.processOperation();
 		verify(services).withdraw(sourceIban,111);
 		verify(services).deposit(targetIban, 100);
 		assertEquals(1, sibs.getNumberOfOperations());
