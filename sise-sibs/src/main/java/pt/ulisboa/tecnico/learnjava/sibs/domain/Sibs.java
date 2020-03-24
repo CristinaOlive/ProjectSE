@@ -16,7 +16,7 @@ public class Sibs {
 
 	public Operation transfer(String sourceIban, String targetIban, int amount)
 			throws SibsException, AccountException, OperationException {
-		TransferOperation operation = new TransferOperation(sourceIban, targetIban, amount);
+		Operation operation = new TransferOperation(sourceIban, targetIban, amount);
 		if(!services.checkAccount(sourceIban) || !services.checkAccount(targetIban)) {
 			throw new SibsException();
 		}
