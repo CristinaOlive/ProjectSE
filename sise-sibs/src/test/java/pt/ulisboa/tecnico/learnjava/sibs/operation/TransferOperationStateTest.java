@@ -51,7 +51,6 @@ public class TransferOperationStateTest {
 	public void successRegistered() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 		assertEquals(100, operation.getValue());
 		assertEquals(SOURCE_IBAN, operation.getSourceIban());
@@ -61,7 +60,6 @@ public class TransferOperationStateTest {
 	@Test
 	public void successWithdrawn() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.Process(services);
@@ -80,7 +78,6 @@ public class TransferOperationStateTest {
 		Client targetClient2 = new Client(sourceBank, FIRST, LAST, NIF2, PHONE_NUMBER, ADDRESS, 22);
 		String targetIban = sourceBank.createAccount(Bank.AccountType.CHECKING, targetClient2, 1000, 0);
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, targetIban, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.Process(services);
@@ -95,7 +92,6 @@ public class TransferOperationStateTest {
 	@Test
 	public void successDeposited() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.Process(services);
@@ -110,7 +106,6 @@ public class TransferOperationStateTest {
 	@Test
 	public void successDepositedCompleted() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.Process(services);
@@ -127,7 +122,6 @@ public class TransferOperationStateTest {
 	@Test
 	public void successDepositedCancel() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.Process(services);
@@ -144,7 +138,6 @@ public class TransferOperationStateTest {
 	@Test
 	public void successWithdrawnCancel() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.Process(services);
@@ -158,7 +151,6 @@ public class TransferOperationStateTest {
 	@Test
 	public void successRegisteredCancel() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.cancel();
@@ -168,7 +160,6 @@ public class TransferOperationStateTest {
 	@Test
 	public void successDepositedCompletedNoCancel() throws OperationException, AccountException, SibsException {
 		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
-		operation.Process(services);
 		assertEquals("registered", operation.getState());
 
 		operation.Process(services);

@@ -17,26 +17,14 @@ public class Sibs {
 	public Operation transfer(String sourceIban, String targetIban, int amount)
 			throws SibsException, AccountException, OperationException {
 		TransferOperation operation = new TransferOperation(sourceIban, targetIban, amount);
-		String state;
-		int j = 0;
-		try {
-			state = operation.Process(services);
-			if(!services.checkAccount(sourceIban) || !services.checkAccount(targetIban)) {
-				throw new SibsException();
-			}
-			state = operation.Process(services);
-			state = operation.Process(services);
-			state = operation.Process(services);
-			addOperation(Operation.OPERATION_TRANSFER, sourceIban, targetIban, amount, state);
-			return operation;
-		} catch (OperationException e) {
-			state = "error";
-			addOperation(Operation.OPERATION_TRANSFER, sourceIban, targetIban, amount, state);
+		if(!services.checkAccount(sourceIban) || !services.checkAccount(targetIban)) {
 			throw new SibsException();
 		}
+		addOperation(Operation.OPERATION_TRANSFER, sourceIban, targetIban, amount);
+		return operation;
 	}
 
-	public int addOperation(String type, String sourceIban, String targetIban, int value, String state)
+	public int addOperation(String type, String sourceIban, String targetIban, int value)
 			throws OperationException, SibsException {
 		int position = -1;
 		for (int i = 0; i < operations.length; i++) {
@@ -52,8 +40,6 @@ public class Sibs {
 		Operation operation;
 		if (type.equals(Operation.OPERATION_TRANSFER)) {
 			operation = new TransferOperation(sourceIban, targetIban, value);
-			TransferOperation op = (TransferOperation) operation;
-			op.setState(state);
 		} else {
 			operation = new PaymentOperation(targetIban, value);
 		}
@@ -74,14 +60,6 @@ public class Sibs {
 			throw new SibsException();
 		}
 		return operations[position];
-	}
-
-	public void changeOperation(int position, String state) throws SibsException {
-		if (position < 0 || position > operations.length) {
-			throw new SibsException();
-		}
-		TransferOperation op = (TransferOperation) getOperation(position);
-		op.setState(state);
 	}
 
 	public int getNumberOfOperations() {
@@ -118,25 +96,15 @@ public class Sibs {
 		int result = 0;
 		String state;
 		for (int i = 0; i < operations.length; i++) {
-			TransferOperation op = (TransferOperation) operations[i];
-			if (op != null) {
-				if(op.getState()=="registered") {
-					op.Process(services);
-					op.Process(services);
-					state = op.Process(services);
-					changeOperation(i, state);
-					result++;
-				}
-				if(op.getState()=="deposited") {
-					op.Process(services);
-					state = op.Process(services);
-					changeOperation(i, state);
-					result++;
-				}
-				if(op.getState()=="withdrawn") {
-					state = op.Process(services);
-					changeOperation(i, state);
-					result++;
+			Operation operation = operations[i];
+			if(operation instanceof TransferOperation) {
+				TransferOperation op = (TransferOperation) operations[i];
+				if (op != null) {
+					try {
+						op.Process(services);
+					}catch(OperationException e) {
+						throw new SibsException();
+					}
 				}
 			}
 		}
@@ -144,6 +112,10 @@ public class Sibs {
 	}
 
 	public void cancelOperation(int position) throws AccountException, SibsException {
-		changeOperation(position, getOperation(position).cancel());
+		Operation operation = getOperation(position);
+		if(operation instanceof TransferOperation) {
+			TransferOperation op = (TransferOperation) operation;
+			op.cancel();
+		}
 	}
 }

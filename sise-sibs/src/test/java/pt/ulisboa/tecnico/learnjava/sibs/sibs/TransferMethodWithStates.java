@@ -47,129 +47,130 @@ public class TransferMethodWithStates {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
 
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-
+		sibs.transfer(sourceIban, targetIban, 100);
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		sibs.processOperation();
+		sibs.processOperation();
+		sibs.processOperation();
 		assertEquals(889, services.getAccountByIban(sourceIban).getBalance());
 		assertEquals(1100, services.getAccountByIban(targetIban).getBalance());
 		assertEquals(1, sibs.getNumberOfOperations());
 		assertEquals(100, sibs.getTotalValueOfOperations());
 		assertEquals(100, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_TRANSFER));
 		assertEquals(0, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_PAYMENT));
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		assertEquals("completed", ope.getState());
+		assertEquals("completed", op.getState());
 	}
 
 	@Test
 	public void successRegistered() throws BankException, AccountException, SibsException, OperationException, ClientException {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "registered");
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		assertEquals("registered", ope.getState());
+		sibs.transfer(sourceIban, targetIban, 100);
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("registered", op.getState());
 	}
 
 	@Test
-	public void successNotFinished() throws BankException, AccountException, SibsException, OperationException, ClientException {
+	public void successDeposited() throws BankException, AccountException, SibsException, OperationException, ClientException {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "deposited");
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		assertEquals("deposited", ope.getState());
-	}
-
-	@Test
-	public void successProcesss() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "deposited");
+		sibs.transfer(sourceIban, targetIban, 100);
 		sibs.transfer(sourceIban, targetIban, 200);
 		sibs.transfer(sourceIban, targetIban, 400);
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		TransferOperation ope2 = (TransferOperation) sibs.getOperation(1);
-		TransferOperation ope3 = (TransferOperation) sibs.getOperation(2);
-		assertEquals("deposited", ope.getState());
-		assertEquals("completed", ope2.getState());
-		assertEquals("completed", ope3.getState());
-		int totalNotFinished = sibs.processOperation();
+		sibs.processOperation();
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("deposited", op.getState());
+		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		assertEquals("deposited", op2.getState());
+		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		assertEquals("deposited", op3.getState());
 		assertEquals(3, sibs.getNumberOfOperations());
-		assertEquals(1, totalNotFinished);
-		assertEquals("completed", ope.getState());
+	}
+
+	@Test
+	public void successMultipleCompleted() throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
+		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
+		sibs.transfer(sourceIban, targetIban, 100);
+		sibs.transfer(sourceIban, targetIban, 200);
+		sibs.transfer(sourceIban, targetIban, 400);
+		sibs.processOperation();
+		sibs.processOperation();
+		sibs.processOperation();
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("completed", op.getState());
+		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		assertEquals("completed", op2.getState());
+		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		assertEquals("completed", op3.getState());
+		assertEquals(3, sibs.getNumberOfOperations());
 	}
 
 	@Test
 	public void successProcessWithdraw() throws BankException, AccountException, SibsException, OperationException, ClientException {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "withdrawn");
+		sibs.transfer(sourceIban, targetIban, 100);
 		sibs.transfer(sourceIban, targetIban, 200);
 		sibs.transfer(sourceIban, targetIban, 400);
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		TransferOperation ope2 = (TransferOperation) sibs.getOperation(1);
-		TransferOperation ope3 = (TransferOperation) sibs.getOperation(2);
-		assertEquals("withdrawn", ope.getState());
-		assertEquals("completed", ope2.getState());
-		assertEquals("completed", ope3.getState());
-		int totalNotFinished = sibs.processOperation();
+		sibs.processOperation();
+		sibs.processOperation();
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("withdrawn", op.getState());
+		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		assertEquals("withdrawn", op2.getState());
+		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		assertEquals("withdrawn", op3.getState());
 		assertEquals(3, sibs.getNumberOfOperations());
-		assertEquals(1, totalNotFinished);
-		assertEquals("completed", ope.getState());
 	}
 
 	@Test
 	public void successProcessRegistered() throws BankException, AccountException, SibsException, OperationException, ClientException {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "registered");
+		sibs.transfer(sourceIban, targetIban, 100);
 		sibs.transfer(sourceIban, targetIban, 200);
 		sibs.transfer(sourceIban, targetIban, 400);
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		TransferOperation ope2 = (TransferOperation) sibs.getOperation(1);
-		TransferOperation ope3 = (TransferOperation) sibs.getOperation(2);
-		assertEquals("registered", ope.getState());
-		assertEquals("completed", ope2.getState());
-		assertEquals("completed", ope3.getState());
-		int totalNotFinished = sibs.processOperation();
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("registered", op.getState());
+		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		assertEquals("registered", op2.getState());
+		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		assertEquals("registered", op3.getState());
 		assertEquals(3, sibs.getNumberOfOperations());
-		assertEquals(1, totalNotFinished);
-		assertEquals("completed", ope.getState());
 	}
 
 	@Test
 	public void successProcessCancelled() throws BankException, AccountException, SibsException, OperationException, ClientException {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "registered");
+		sibs.transfer(sourceIban, targetIban, 100);
 		sibs.cancelOperation(0);
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		assertEquals("cancelled", ope.getState());
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("cancelled", op.getState());
 	}
 
 	@Test
 	public void successProcessCancelledDeposited() throws BankException, AccountException, SibsException, OperationException, ClientException {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "deposited");
+		sibs.transfer(sourceIban, targetIban, 100);
+		sibs.processOperation();
 		sibs.cancelOperation(0);
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		assertEquals("cancelled", ope.getState());
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("cancelled", op.getState());
 	}
 
 	@Test
 	public void successProcessCancelledWithdrawn() throws BankException, AccountException, SibsException, OperationException, ClientException {
 		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
 		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		Operation op = sibs.transfer(sourceIban, targetIban, 100);
-		sibs.changeOperation(0, "withdrawn");
+		sibs.transfer(sourceIban, targetIban, 100);
+		sibs.processOperation();
+		sibs.processOperation();
 		sibs.cancelOperation(0);
-		TransferOperation ope = (TransferOperation) sibs.getOperation(0);
-		assertEquals("cancelled", ope.getState());
+		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+		assertEquals("cancelled", op.getState());
 	}
 
 	@After

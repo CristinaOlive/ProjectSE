@@ -26,7 +26,7 @@ public class AddOperationMethodTest {
 
 	@Test
 	public void success() throws OperationException, SibsException {
-		int position = sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		int position = sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
 
 		Operation operation = sibs.getOperation(position);
 
@@ -37,11 +37,11 @@ public class AddOperationMethodTest {
 
 	@Test
 	public void successWithDelete() throws OperationException, SibsException {
-		int position = sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
-		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
-		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		int position = sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
 		sibs.removeOperation(position);
-		position = sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, 200, "completed");
+		position = sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, 200);
 
 		Operation operation = sibs.getOperation(position);
 
@@ -52,10 +52,10 @@ public class AddOperationMethodTest {
 
 	@Test(expected = SibsException.class)
 	public void failIsFull() throws OperationException, SibsException {
-		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
-		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
-		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
-		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE, "completed");
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
+		sibs.addOperation(Operation.OPERATION_TRANSFER, SOURCE_IBAN, TARGET_IBAN, VALUE);
 	}
 
 	@After

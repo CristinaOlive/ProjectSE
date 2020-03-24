@@ -21,7 +21,7 @@ public class RemoveOperationMethodTest {
 	@Before
 	public void setUp() throws OperationException, SibsException {
 		sibs = new Sibs(3, new Services());
-		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE, "completed");
+		sibs.addOperation(Operation.OPERATION_PAYMENT, null, TARGET_IBAN, VALUE);
 	}
 
 	@Test

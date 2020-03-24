@@ -48,6 +48,9 @@ public class TransferMethodTest {
 
 		sibs.transfer(sourceIban, targetIban, 100);
 
+		sibs.processOperation();
+		sibs.processOperation();
+		sibs.processOperation();
 		assertEquals(889, services.getAccountByIban(sourceIban).getBalance());
 		assertEquals(1100, services.getAccountByIban(targetIban).getBalance());
 		assertEquals(1, sibs.getNumberOfOperations());

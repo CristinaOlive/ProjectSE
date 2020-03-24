@@ -13,7 +13,7 @@ class setState {
 	private int tries;
 
 	public setState(String state) {
-		tries = 3;
+		tries = 2;
 		if(state.isEmpty()) {
 			currentState = new Registered();
 		}

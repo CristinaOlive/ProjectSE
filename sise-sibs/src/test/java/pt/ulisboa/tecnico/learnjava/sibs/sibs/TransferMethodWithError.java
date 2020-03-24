@@ -38,12 +38,13 @@ public class TransferMethodWithError {
 		when(services.checkAccount(sourceIban)).thenReturn(true);
 
 		when(services.deposit(targetIban, 100)).thenThrow(AccountException.class);
+		sibs.transfer(sourceIban, targetIban, 100);
 		try {
-			sibs.transfer(sourceIban, targetIban, 100);
+			sibs.processOperation();
 			fail();
 		} catch (SibsException e) {
 			verify(services, never()).withdraw(sourceIban, 111);
-			verify(services, times(4)).deposit(targetIban, 100);
+			verify(services, times(3)).deposit(targetIban, 100);
 			assertEquals(1, sibs.getNumberOfOperations());
 			TransferOperation op = (TransferOperation) sibs.getOperation(0);
 			assertEquals("error", op.getState());
