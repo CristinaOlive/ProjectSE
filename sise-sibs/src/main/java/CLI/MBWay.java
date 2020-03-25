@@ -102,9 +102,7 @@ public class MBWay {
 		if (sumAllAccount(instructions) != totals[1]) {
 			throw new BillAmountException();
 		}
-		String[] numbers = new String[2];
-		numbers[0] = this.phoneNumber;
-		numbers[1] = instructions.get(0).x;
+		String[] numbers = { this.phoneNumber, instructions.get(0).x };
 		int amountuser1 = instructions.get(0).y;
 		transferMBWay(numbers, amountuser1);
 		for (int i = 1; i < instructions.size(); i++) {
