@@ -33,48 +33,48 @@ public class ExamTests {
 
 	@Before
 	public void setUp() throws AccountException, ClientException, BankException {
-		this.services = new Services();
-		this.bank = new Bank("CGD");
+		services = new Services();
+		bank = new Bank("CGD");
+		String[] personalInfo = new String[] {"Jos�", "Manuel", "Street"};
+		client = new Client(bank, personalInfo, "123456789", "987654321", 33);
+		Client otherClient = new Client(bank, personalInfo, "023456789", "987654321", 33);
+		youngClient = new Client(bank, personalInfo, "123456780", "987654321", 17);
 
-		this.client = new Client(this.bank, "José", "Manuel", "123456789", "987654321", "Street", 33);
-		Client otherClient = new Client(this.bank, "José", "Manuel", "023456789", "987654321", "Street", 33);
-		this.youngClient = new Client(this.bank, "José", "Manuel", "123456780", "987654321", "Street", 17);
+		checking = (CheckingAccount) services
+				.getAccountByIban(bank.createAccount(Bank.AccountType.CHECKING, client, 0, 0));
 
-		this.checking = (CheckingAccount) this.services
-				.getAccountByIban(this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 0, 0));
+		otherChecking = (CheckingAccount) services
+				.getAccountByIban(bank.createAccount(Bank.AccountType.CHECKING, otherClient, 100, 0));
 
-		this.otherChecking = (CheckingAccount) this.services
-				.getAccountByIban(this.bank.createAccount(Bank.AccountType.CHECKING, otherClient, 100, 0));
+		savings = (SavingsAccount) services
+				.getAccountByIban(bank.createAccount(Bank.AccountType.SAVINGS, client, 100, 10));
 
-		this.savings = (SavingsAccount) this.services
-				.getAccountByIban(this.bank.createAccount(Bank.AccountType.SAVINGS, this.client, 100, 10));
+		young = (YoungAccount) services
+				.getAccountByIban(bank.createAccount(Bank.AccountType.YOUNG, youngClient, 0, 0));
 
-		this.young = (YoungAccount) this.services
-				.getAccountByIban(this.bank.createAccount(Bank.AccountType.YOUNG, this.youngClient, 0, 0));
-
-		this.salary = (SalaryAccount) this.services
-				.getAccountByIban(this.bank.createAccount(Bank.AccountType.SALARY, this.client, 0, 1000));
+		salary = (SalaryAccount) services
+				.getAccountByIban(bank.createAccount(Bank.AccountType.SALARY, client, 0, 1000));
 	}
 
 	// OK 1.1 a
 	@Test
 	public void successInactiveAccount() throws AccountException {
-		this.savings.inactive(this.checking);
+		savings.inactive(checking);
 
-		assertTrue(this.savings.isInactive());
-		assertEquals(100, this.checking.getBalance());
+		assertTrue(savings.isInactive());
+		assertEquals(100, checking.getBalance());
 	}
 
 	// OK 1.1 b
 	@Test
 	public void isInactiveAccount() throws AccountException {
-		this.savings.inactive(this.checking);
+		savings.inactive(checking);
 
 		try {
-			this.savings.inactive(this.checking);
+			savings.inactive(checking);
 			fail();
 		} catch (AccountException e) {
-			assertTrue(this.savings.isInactive());
+			assertTrue(savings.isInactive());
 		}
 	}
 
@@ -82,140 +82,140 @@ public class ExamTests {
 	@Test
 	public void differentClients() throws AccountException {
 		try {
-			this.checking.inactive(this.otherChecking);
+			checking.inactive(otherChecking);
 			fail();
 		} catch (AccountException e) {
-			assertFalse(this.checking.isInactive());
-			assertFalse(this.otherChecking.isInactive());
+			assertFalse(checking.isInactive());
+			assertFalse(otherChecking.isInactive());
 		}
 	}
 
 	// OK 1.1 d
 	@Test
 	public void sumOfBalancesIsNegative() throws AccountException {
-		this.salary.withdraw(900);
+		salary.withdraw(900);
 		try {
-			this.salary.inactive(this.checking);
+			salary.inactive(checking);
 			fail();
 		} catch (AccountException e) {
-			assertFalse(this.salary.isInactive());
-			assertEquals(0, this.checking.getBalance());
-			assertEquals(-900, this.salary.getBalance());
+			assertFalse(salary.isInactive());
+			assertEquals(0, checking.getBalance());
+			assertEquals(-900, salary.getBalance());
 		}
 	}
 
 	// OK 1.1 e
 	@Test(expected = AccountException.class)
 	public void balanceOfAccountIsZeroAndCheckingIsNotNull() throws AccountException {
-		this.young.inactive(this.checking);
+		young.inactive(checking);
 	}
 
 	// OK 1.1 f
 	@Test
 	public void balanceOfAccountIsZeroAndCheckingIsNull() throws AccountException {
-		this.young.inactive(null);
+		young.inactive(null);
 
-		assertTrue(this.young.isInactive());
+		assertTrue(young.isInactive());
 	}
 
 	// OK 1.2
 	@Test
 	public void depositActiveAccount() throws AccountException {
-		this.checking.deposit(100);
-		assertEquals(100, this.checking.getBalance());
+		checking.deposit(100);
+		assertEquals(100, checking.getBalance());
 	}
 
 	@Test(expected = AccountException.class)
 	public void depositInactiveAccount() throws AccountException {
-		this.checking.inactive(null);
+		checking.inactive(null);
 
-		this.checking.deposit(100);
+		checking.deposit(100);
 	}
 
 	@Test
 	public void withdrawActiveAccount() throws AccountException {
-		this.otherChecking.withdraw(50);
-		assertEquals(50, this.otherChecking.getBalance());
+		otherChecking.withdraw(50);
+		assertEquals(50, otherChecking.getBalance());
 	}
 
 	@Test(expected = AccountException.class)
 	public void withdrawInactiveAccount() throws AccountException {
-		this.checking.inactive(null);
+		checking.inactive(null);
 
-		this.checking.withdraw(50);
+		checking.withdraw(50);
 	}
 
 	// 1.3 OK
 	@Test
 	public void clientHasOneActiveAndTwoInactive() throws AccountException {
-		this.savings.inactive(this.checking);
-		this.salary.inactive(null);
+		savings.inactive(checking);
+		salary.inactive(null);
 
-		assertFalse(this.client.isInactive());
+		assertFalse(client.isInactive());
 	}
 
 	@Test
 	public void clientHasAllThreeInactive() throws AccountException {
-		this.savings.inactive(this.checking);
-		this.salary.inactive(null);
-		this.checking.withdraw(100);
-		this.checking.inactive(null);
+		savings.inactive(checking);
+		salary.inactive(null);
+		checking.withdraw(100);
+		checking.inactive(null);
 
-		assertTrue(this.client.isInactive());
+		assertTrue(client.isInactive());
 	}
 
 	// 1.4 OK
 	@Test
 	public void countNumberOfInactiveAccountsForClientThatHasOneActiveAndTwoInactive() throws AccountException {
-		this.savings.inactive(this.checking);
-		this.salary.inactive(null);
+		savings.inactive(checking);
+		salary.inactive(null);
 
-		assertEquals(2, this.client.numberOfInactiveAccounts());
+		assertEquals(2, client.numberOfInactiveAccounts());
 	}
 
 	@Test
 	public void countNumberOfInactiveAccountsForClientThatHasAllThreeInactive() throws AccountException {
-		this.savings.inactive(this.checking);
-		this.salary.inactive(null);
-		this.checking.withdraw(100);
-		this.checking.inactive(null);
+		savings.inactive(checking);
+		salary.inactive(null);
+		checking.withdraw(100);
+		checking.inactive(null);
 
-		assertEquals(3, this.client.numberOfInactiveAccounts());
+		assertEquals(3, client.numberOfInactiveAccounts());
 	}
 
 	// 2 OK
 	@Test
 	public void CheckingClientHasOver18() throws ClientException {
-		int numberOfAccounts = this.bank.getTotalNumberOfAccounts();
+		int numberOfAccounts = bank.getTotalNumberOfAccounts();
 		try {
-			new CheckingAccount(this.youngClient, 0);
+			new CheckingAccount(youngClient, 0);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(numberOfAccounts, this.bank.getTotalNumberOfAccounts());
+			assertEquals(numberOfAccounts, bank.getTotalNumberOfAccounts());
 		}
 
 	}
 
 	@Test
 	public void SavingsClientHasOver18() throws ClientException {
-		int numberOfAccounts = this.bank.getTotalNumberOfAccounts();
+		int numberOfAccounts = bank.getTotalNumberOfAccounts();
 		try {
-			new SavingsAccount(this.youngClient, 0, 100);
+			new SavingsAccount(youngClient, 0, 100);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(numberOfAccounts, this.bank.getTotalNumberOfAccounts());
+			assertEquals(numberOfAccounts, bank.getTotalNumberOfAccounts());
 		}
 
 	}
 
 	@Test
 	public void SalaryClientHasOver18() throws ClientException {
-		int numberOfAccounts = this.bank.getTotalNumberOfAccounts();
+		int numberOfAccounts = bank.getTotalNumberOfAccounts();
 		try {
-			new SalaryAccount(this.youngClient, 0, 1000);
+			new SalaryAccount(youngClient, 0, 1000);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(numberOfAccounts, this.bank.getTotalNumberOfAccounts());
+			assertEquals(numberOfAccounts, bank.getTotalNumberOfAccounts());
 		}
 
 	}

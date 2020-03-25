@@ -24,48 +24,49 @@ public class CreateAccountMethodTest {
 	private Bank bank;
 	private Client client;
 	private Services services;
+	String[] personalInfo = new String[] {"Jos�", "Manuel", "Street"};
 
 	@Before
 	public void setUp() throws BankException, ClientException {
-		this.services = new Services();
-		this.bank = new Bank("CGD");
-		this.client = new Client(this.bank, "José", "Manuel", "123456789", "987654321", "Street", 33);
+		services = new Services();
+		bank = new Bank("CGD");
+		client = new Client(bank, personalInfo, "123456789", "987654321", 33);
 	}
 
 	@Test
 	public void successCheckingAccount() throws BankException, AccountException, ClientException {
-		String iban = this.bank.createAccount(AccountType.CHECKING, this.client, 100, 0);
+		String iban = bank.createAccount(AccountType.CHECKING, client, 100, 0);
 
-		Account account = this.services.getAccountByIban(iban);
+		Account account = services.getAccountByIban(iban);
 
 		assertTrue(account instanceof CheckingAccount);
-		assertEquals(1, this.bank.getTotalNumberOfAccounts());
-		assertEquals(this.client, account.getClient());
+		assertEquals(1, bank.getTotalNumberOfAccounts());
+		assertEquals(client, account.getClient());
 		assertEquals(100, account.getBalance());
 	}
 
 	@Test
 	public void successSavingsAccount() throws BankException, AccountException, ClientException {
-		String iban = this.bank.createAccount(AccountType.SAVINGS, this.client, 100, 100);
+		String iban = bank.createAccount(AccountType.SAVINGS, client, 100, 100);
 
-		Account account = this.services.getAccountByIban(iban);
+		Account account = services.getAccountByIban(iban);
 
 		assertTrue(account instanceof SavingsAccount);
-		assertEquals(1, this.bank.getTotalNumberOfAccounts());
-		assertEquals(this.client, account.getClient());
+		assertEquals(1, bank.getTotalNumberOfAccounts());
+		assertEquals(client, account.getClient());
 		assertEquals(100, account.getBalance());
 		assertEquals(100, ((SavingsAccount) account).getBase());
 	}
 
 	@Test
 	public void successYoungAccount() throws BankException, AccountException, ClientException {
-		Client youngClient = new Client(this.bank, "José", "Manuel", "123456780", "987654321", "Street", 16);
-		String iban = this.bank.createAccount(AccountType.YOUNG, youngClient, 100, 100);
+		Client youngClient = new Client(bank, personalInfo, "123456780", "987654321", 16);
+		String iban = bank.createAccount(AccountType.YOUNG, youngClient, 100, 100);
 
-		Account account = this.services.getAccountByIban(iban);
+		Account account = services.getAccountByIban(iban);
 
 		assertTrue(account instanceof SavingsAccount);
-		assertEquals(1, this.bank.getTotalNumberOfAccounts());
+		assertEquals(1, bank.getTotalNumberOfAccounts());
 		assertEquals(youngClient, account.getClient());
 		assertEquals(100, account.getBalance());
 		assertEquals(10, ((SavingsAccount) account).getBase());
@@ -73,37 +74,37 @@ public class CreateAccountMethodTest {
 
 	@Test
 	public void failYoungAccountMoreThan17() throws BankException, AccountException, ClientException {
-		Client notSoYoungClient = new Client(this.bank, "José", "Manuel", "123456780", "987654321", "Street", 18);
+		Client notSoYoungClient = new Client(bank, personalInfo, "123456780", "987654321", 18);
 
 		try {
-			this.bank.createAccount(AccountType.YOUNG, notSoYoungClient, 100, 100);
+			bank.createAccount(AccountType.YOUNG, notSoYoungClient, 100, 100);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(0, this.bank.getTotalNumberOfAccounts());
+			assertEquals(0, bank.getTotalNumberOfAccounts());
 		}
 	}
 
 	@Test
 	public void failYoungAccountBaseNot10() throws BankException, AccountException, ClientException {
-		Client notSoYoungClient = new Client(this.bank, "José", "Manuel", "123456780", "987654321", "Street", 18);
+		Client notSoYoungClient = new Client(bank, personalInfo, "123456780", "987654321", 18);
 
 		try {
-			this.bank.createAccount(AccountType.YOUNG, notSoYoungClient, 100, 100);
+			bank.createAccount(AccountType.YOUNG, notSoYoungClient, 100, 100);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(0, this.bank.getTotalNumberOfAccounts());
+			assertEquals(0, bank.getTotalNumberOfAccounts());
 		}
 	}
 
 	@Test
 	public void successSalaryAccount() throws BankException, AccountException, ClientException {
-		String iban = this.bank.createAccount(AccountType.SALARY, this.client, 100, 100);
+		String iban = bank.createAccount(AccountType.SALARY, client, 100, 100);
 
-		Account account = this.services.getAccountByIban(iban);
+		Account account = services.getAccountByIban(iban);
 
 		assertTrue(account instanceof SalaryAccount);
-		assertEquals(1, this.bank.getTotalNumberOfAccounts());
-		assertEquals(this.client, account.getClient());
+		assertEquals(1, bank.getTotalNumberOfAccounts());
+		assertEquals(client, account.getClient());
 		assertEquals(100, account.getBalance());
 		assertEquals(100, ((SalaryAccount) account).getSalary());
 	}
@@ -111,7 +112,7 @@ public class CreateAccountMethodTest {
 	@Test(expected = BankException.class)
 	public void clientHasAccountOfAnotherBank() throws AccountException, ClientException, BankException {
 		Bank otherBank = new Bank("BPI");
-		otherBank.createAccount(AccountType.CHECKING, this.client, 100, 0);
+		otherBank.createAccount(AccountType.CHECKING, client, 100, 0);
 	}
 
 	@After

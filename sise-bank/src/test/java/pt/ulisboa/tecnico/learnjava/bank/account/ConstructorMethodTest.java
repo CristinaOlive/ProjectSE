@@ -24,17 +24,18 @@ public class ConstructorMethodTest {
 
 	@Before
 	public void setUp() throws BankException, ClientException {
-		this.bank = new Bank("CGD");
-		this.client = new Client(this.bank, "JosÃ©", "Manuel", "123456789", "987654321", "Street", 33);
+		bank = new Bank("CGD");
+		String[] personalInfo = new String[] {"José", "Manuel", "Street"};
+		client = new Client(bank, personalInfo, "123456789", "987654321", 33);
 	}
 
 	@Test
 	public void success() throws AccountException, ClientException {
-		Account account = new CheckingAccount(this.client, AMOUNT);
+		Account account = new CheckingAccount(client, AMOUNT);
 
-		assertEquals(this.client, account.getClient());
+		assertEquals(client, account.getClient());
 		assertEquals(AMOUNT, account.getBalance());
-		assertTrue(this.client.hasAccount(account));
+		assertTrue(client.hasAccount(account));
 	}
 
 	@Test
@@ -49,17 +50,17 @@ public class ConstructorMethodTest {
 
 	@Test
 	public void limitOfAccountsPerClient() throws AccountException, ClientException {
-		new CheckingAccount(this.client, AMOUNT);
-		new CheckingAccount(this.client, AMOUNT);
-		new CheckingAccount(this.client, AMOUNT);
-		new CheckingAccount(this.client, AMOUNT);
-		new CheckingAccount(this.client, AMOUNT);
+		new CheckingAccount(client, AMOUNT);
+		new CheckingAccount(client, AMOUNT);
+		new CheckingAccount(client, AMOUNT);
+		new CheckingAccount(client, AMOUNT);
+		new CheckingAccount(client, AMOUNT);
 
 		try {
-			new CheckingAccount(this.client, AMOUNT);
+			new CheckingAccount(client, AMOUNT);
 			fail();
 		} catch (ClientException e) {
-			assertEquals(5, this.client.getNumberOfAccounts());
+			assertEquals(5, client.getNumberOfAccounts());
 		}
 
 	}
