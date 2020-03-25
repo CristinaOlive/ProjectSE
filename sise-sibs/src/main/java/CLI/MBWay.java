@@ -61,13 +61,13 @@ public class MBWay {
 	/*
 	 * Transfers money from one account to the other, throws two important
 	 * exceptions that help the splitbill method not be overloaded with if
-	 * statements
+	 * statements; numbers[0] -> sourceNumber; numbers[1] -> targetNumber
 	 */
-	public void transferMBWay(String sourceNumber, String targetNumber, int amount) throws AccountException,
-			OverdraftException, UnregisteredNumberException, SibsException, OperationException {
-		String sourceIBAN = MBWay.get(sourceNumber);
-		String targetIBAN = MBWay.get(targetNumber);
-		if (!isNumRegist(sourceNumber) || !isNumRegist(targetNumber)) {
+	public void transferMBWay(String[] numbers, int amount) throws AccountException, OverdraftException,
+			UnregisteredNumberException, SibsException, OperationException {
+		String sourceIBAN = MBWay.get(numbers[0]);
+		String targetIBAN = MBWay.get(numbers[1]);
+		if (!isNumRegist(numbers[0]) || !isNumRegist(numbers[1])) {
 			throw new UnregisteredNumberException();
 		}
 		if (getBalanceByIBAN(sourceIBAN) < amount) {
@@ -86,29 +86,29 @@ public class MBWay {
 	 * decisiontest <billowner/target phone number> <amount to be paid by
 	 * loggedinuser> || decisiontest <sourceNumber-friend that is paying> <amount to
 	 * be paid by current friend> || decisiontest <sourceNumber-friend that is
-	 * paying> <amount to be paid by current friend> || (...) || end
-	 *
-	 * --> Transfer
+	 * paying> <amount to be paid by current friend> || (...) || end --> totals[0] =
+	 * total number of friends -> totals[1] = total bill amount; --> TransferMBWay
+	 * throws remaining exceptions
 	 */
-	public void splitBill(List<Tuple<String, Integer>> instructions, int numFriends, int total)
+	public void splitBill(List<Tuple<String, Integer>> instructions, int[] totals)
 			throws UnregisteredNumberException, AccountException, OverdraftException, TooFriendlyException,
 			SibsException, OperationException, TooShyException, BillAmountException {
-		if (instructions.size() - 1 > numFriends) {
+		if (instructions.size() - 1 > totals[0]) {
 			throw new TooFriendlyException();
 		}
-		if (instructions.size() - 1 < numFriends) {
+		if (instructions.size() - 1 < totals[0]) {
 			throw new TooShyException();
 		}
-		if (sumAllAccount(instructions) != total) {
+		if (sumAllAccount(instructions) != totals[1]) {
 			throw new BillAmountException();
 		}
-		String targetNumber = instructions.get(0).x;
+		String[] numbers = { this.phoneNumber, instructions.get(0).x };
 		int amountuser1 = instructions.get(0).y;
-		transferMBWay(this.phoneNumber, targetNumber, amountuser1);
+		transferMBWay(numbers, amountuser1);
 		for (int i = 1; i < instructions.size(); i++) {
-			String sourceNumber = instructions.get(i).x;
+			numbers[0] = instructions.get(i).x;
 			int amountPerUser = instructions.get(i).y;
-			transferMBWay(sourceNumber, targetNumber, amountPerUser);
+			transferMBWay(numbers, amountPerUser);
 		}
 	}
 
@@ -153,13 +153,8 @@ public class MBWay {
 	}
 
 	public int getBalanceByIBAN(String IBAN) throws AccountException {
-		try {
-			int balance = this.services.getAccountByIban(IBAN).getBalance();
-			return balance;
-		} catch (AccountException ex) {
-			System.out.println(ex.getMessage());
-		}
-		return 0;
+		int balance = this.services.getAccountByIban(IBAN).getBalance();
+		return balance;
 	}
 
 	public String getIBANByPhoneNumber(String phoneNumber) {
