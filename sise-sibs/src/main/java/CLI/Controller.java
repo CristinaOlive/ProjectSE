@@ -66,8 +66,7 @@ public class Controller {
 	public void transfer(String[] info)
 			throws NumberFormatException, SibsException, AccountException, OperationException {
 		try {
-			String[] numbers = { info[1], info[2] };
-			this.mbwayconsole.transferMBWay(numbers, Integer.parseInt(info[3]));
+			this.mbwayconsole.transferMBWay(info[1], info[2], Integer.parseInt(info[3]));
 			this.view.transferS();
 		} catch (UnregisteredNumberException ex) {
 			this.view.transferF1();
@@ -80,10 +79,10 @@ public class Controller {
 
 	/* Performs split-bill operation */
 
-	public void splitBill(List<Tuple<String, Integer>> instructions, int[] totals)
+	public void splitBill(List<Tuple<String, Integer>> instructions, int numFriends, int total)
 			throws SibsException, AccountException, OperationException {
 		try {
-			this.mbwayconsole.splitBill(instructions, totals);
+			this.mbwayconsole.splitBill(instructions, numFriends, total);
 			this.view.splitbillS();
 		} catch (UnregisteredNumberException ex) {
 			this.view.splitbillF1(ex.getMessage());

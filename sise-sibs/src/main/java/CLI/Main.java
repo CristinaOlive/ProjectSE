@@ -36,13 +36,14 @@ public class Main {
 				break;
 			case "mbway-split-bill":
 				List<Tuple<String, Integer>> instructions = new ArrayList<Tuple<String, Integer>>();
-				int[] totals = { Integer.parseInt(info[1]), Integer.parseInt(info[2]) };
+				int numFriends = Integer.parseInt(info[1]);
+				int total = Integer.parseInt(info[2]);
 				while (!(info[0].equals("end"))) {
 					info = controler.inputParser(input.nextLine());
 					Tuple<String, Integer> tuplo = new Tuple<String, Integer>(info[1], Integer.parseInt(info[2]));
 					instructions.add(tuplo);
 				}
-				controler.splitBill(instructions, totals);
+				controler.splitBill(instructions, numFriends, total);
 				break;
 			}
 		}
