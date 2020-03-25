@@ -92,8 +92,7 @@ public class Sibs {
 		return result;
 	}
 
-	public int processOperation() throws AccountException, SibsException, OperationException {
-		int result = 0;
+	public void processOperation() throws AccountException, SibsException, OperationException {
 		String state;
 		for (int i = 0; i < operations.length; i++) {
 			Operation operation = operations[i];
@@ -102,13 +101,12 @@ public class Sibs {
 				if (op != null) {
 					try {
 						op.Process(services);
-					}catch(OperationException e) {
+					} catch(OperationException e) {
 						throw new SibsException();
 					}
 				}
 			}
 		}
-		return result;
 	}
 
 	public void cancelOperation(int position) throws AccountException, SibsException {
