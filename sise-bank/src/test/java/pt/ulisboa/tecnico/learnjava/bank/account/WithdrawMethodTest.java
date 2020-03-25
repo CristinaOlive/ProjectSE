@@ -28,104 +28,104 @@ public class WithdrawMethodTest {
 	@Before
 	public void setUp() throws AccountException, BankException, ClientException {
 		Bank bank = new Bank("CGD");
+		String[] personalInfo = new String[] {"Jos�", "Manuel", "Street"};
+		Client client = new Client(bank, personalInfo, "123456789", "987654321", 33);
+		Client youngClient = new Client(bank, personalInfo, "123456780", "987654321", 17);
 
-		Client client = new Client(bank, "José", "Manuel", "123456789", "987654321", "Street", 33);
-		Client youngClient = new Client(bank, "José", "Manuel", "123456780", "987654321", "Street", 17);
-
-		this.checking = new CheckingAccount(client, 100);
-		this.savings = new SavingsAccount(client, 100, 10);
-		this.salary = new SalaryAccount(client, 100, 1000);
-		this.young = new YoungAccount(youngClient, 100);
+		checking = new CheckingAccount(client, 100);
+		savings = new SavingsAccount(client, 100, 10);
+		salary = new SalaryAccount(client, 100, 1000);
+		young = new YoungAccount(youngClient, 100);
 	}
 
 	@Test
 	public void successForCheckingAccount() throws AccountException {
-		this.checking.withdraw(50);
+		checking.withdraw(50);
 
-		assertEquals(50, this.checking.getBalance());
+		assertEquals(50, checking.getBalance());
 	}
 
 	@Test
 	public void negativeAmountForCheckingAccount() {
 		try {
-			this.checking.withdraw(-10);
+			checking.withdraw(-10);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(100, this.checking.getBalance());
+			assertEquals(100, checking.getBalance());
 		}
 	}
 
 	@Test
 	public void notEnoughBalanceForCheckingAccount() {
 		try {
-			this.checking.withdraw(200);
+			checking.withdraw(200);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(100, this.checking.getBalance());
+			assertEquals(100, checking.getBalance());
 		}
 	}
 
 	@Test
 	public void successForSavingsAccount() throws AccountException {
-		this.savings.withdraw(100);
+		savings.withdraw(100);
 
-		assertEquals(0, this.savings.getBalance());
+		assertEquals(0, savings.getBalance());
 	}
 
 	@Test
 	public void negativeAmountForSavingsAccount() {
 		try {
-			this.savings.withdraw(-10);
+			savings.withdraw(-10);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(100, this.checking.getBalance());
+			assertEquals(100, checking.getBalance());
 		}
 	}
 
 	@Test
 	public void amountNotEqualToBalanceInSavingsAccount() {
 		try {
-			this.savings.withdraw(50);
+			savings.withdraw(50);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(100, this.savings.getBalance());
+			assertEquals(100, savings.getBalance());
 		}
 	}
 
 	@Test
 	public void successNegativeBalanceForSalaryAccount() throws AccountException {
-		this.salary.withdraw(900);
+		salary.withdraw(900);
 
-		assertEquals(-800, this.salary.getBalance());
+		assertEquals(-800, salary.getBalance());
 	}
 
 	@Test
 	public void negativeAmountForSalaryAccount() {
 		try {
-			this.salary.withdraw(-10);
+			salary.withdraw(-10);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(100, this.checking.getBalance());
+			assertEquals(100, checking.getBalance());
 		}
 	}
 
 	@Test
 	public void failNegativeBalanceForSalaryAccount() throws AccountException {
 		try {
-			this.salary.withdraw(2000);
+			salary.withdraw(2000);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(100, this.salary.getBalance());
+			assertEquals(100, salary.getBalance());
 		}
 	}
 
 	@Test
 	public void noWithdrawForYoung() throws AccountException {
 		try {
-			this.young.withdraw(100);
+			young.withdraw(100);
 			fail();
 		} catch (AccountException e) {
-			assertEquals(100, this.young.getBalance());
+			assertEquals(100, young.getBalance());
 		}
 	}
 

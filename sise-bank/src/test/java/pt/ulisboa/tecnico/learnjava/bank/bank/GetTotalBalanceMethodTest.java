@@ -18,25 +18,25 @@ public class GetTotalBalanceMethodTest {
 
 	@Before
 	public void setUp() throws BankException, AccountException, ClientException {
-		this.bank = new Bank("CGD");
-
-		this.client = new Client(this.bank, "JosÃ©", "Manuel", "123456789", "987654321", "Street", 33);
+		bank = new Bank("CGD");
+		String[] personalInfo = new String[] {"José", "Manuel", "Street"};
+		client = new Client(bank, personalInfo, "123456789", "987654321", 33);
 	}
 
 	@Test
 	public void fiveAccounts() throws BankException, AccountException, ClientException {
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
 
-		assertEquals(500, this.bank.getTotalBalance());
+		assertEquals(500, bank.getTotalBalance());
 	}
 
 	@Test
 	public void noAccounts() {
-		assertEquals(0, this.bank.getTotalBalance());
+		assertEquals(0, bank.getTotalBalance());
 	}
 
 	@After

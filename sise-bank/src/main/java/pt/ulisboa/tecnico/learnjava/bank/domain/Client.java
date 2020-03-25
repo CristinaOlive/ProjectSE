@@ -19,16 +19,16 @@ public class Client {
 	private final String address;
 	private int age;
 
-	public Client(Bank bank, String firstName, String lastName, String nif, String phoneNumber, String address, int age)
+	public Client(Bank bank, String [] personalInfo, String nif, String phoneNumber, int age)
 			throws ClientException {
 		checkParameters(bank, nif, phoneNumber, age);
 
 		this.bank = bank;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		firstName = personalInfo[0];
+		lastName = personalInfo[1];
 		this.nif = nif;
 		this.phoneNumber = phoneNumber;
-		this.address = address;
+		address = personalInfo[2];
 		this.age = age;
 
 		bank.addClient(this);
@@ -53,33 +53,33 @@ public class Client {
 	}
 
 	public void addAccount(Account account) throws ClientException {
-		if (this.accounts.size() == 5) {
+		if (accounts.size() == 5) {
 			throw new ClientException();
 		}
 
-		this.accounts.add(account);
+		accounts.add(account);
 	}
 
 	public void deleteAccount(Account account) {
-		this.accounts.remove(account);
+		accounts.remove(account);
 	}
 
 	public boolean hasAccount(Account account) {
-		return this.accounts.contains(account);
+		return accounts.contains(account);
 	}
 
 	public int getNumberOfAccounts() {
-		return this.accounts.size();
+		return accounts.size();
 	}
 
 	public Stream<Account> getAccounts() {
-		return this.accounts.stream();
+		return accounts.stream();
 	}
 
 	public void happyBirthDay() throws BankException, AccountException, ClientException {
-		this.age++;
+		age++;
 
-		if (this.age == 18) {
+		if (age == 18) {
 			Set<Account> accounts = new HashSet<Account>(this.accounts);
 			for (Account account : accounts) {
 				YoungAccount youngAccount = (YoungAccount) account;
@@ -89,39 +89,39 @@ public class Client {
 	}
 
 	public boolean isInactive() {
-		return this.accounts.stream().allMatch(a -> a.isInactive());
+		return accounts.stream().allMatch(a -> a.isInactive());
 	}
 
 	public int numberOfInactiveAccounts() {
-		return (int) this.accounts.stream().filter(a -> a.isInactive()).count();
+		return (int) accounts.stream().filter(a -> a.isInactive()).count();
 	}
 
 	public Bank getBank() {
-		return this.bank;
+		return bank;
 	}
 
 	public String getFirstName() {
-		return this.firstName;
+		return firstName;
 	}
 
 	public String getLastName() {
-		return this.lastName;
+		return lastName;
 	}
 
 	public String getNif() {
-		return this.nif;
+		return nif;
 	}
 
 	public String getPhoneNumber() {
-		return this.phoneNumber;
+		return phoneNumber;
 	}
 
 	public String getAddress() {
-		return this.address;
+		return address;
 	}
 
 	public int getAge() {
-		return this.age;
+		return age;
 	}
 
 	public void setAge(int age) {

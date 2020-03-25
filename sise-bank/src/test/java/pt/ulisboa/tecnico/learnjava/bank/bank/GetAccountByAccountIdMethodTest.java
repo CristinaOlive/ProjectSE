@@ -19,17 +19,17 @@ public class GetAccountByAccountIdMethodTest {
 
 	@Before
 	public void setUp() throws BankException, AccountException, ClientException {
-		this.bank = new Bank("CGD");
-
-		this.client = new Client(this.bank, "JosÃ©", "Manuel", "123456789", "987654321", "Street", 33);
+		bank = new Bank("CGD");
+		String[] personalInfo = new String[] {"José", "Manuel", "Street"};
+		client = new Client(bank, personalInfo, "123456789", "987654321", 33);
 	}
 
 	@Test
 	public void success() throws BankException, AccountException, ClientException {
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
-		Account account = this.bank.getAccounts().findFirst().get();
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
+		Account account = bank.getAccounts().findFirst().get();
 
-		assertEquals(account, this.bank.getAccountByAccountId(account.getAccountId()));
+		assertEquals(account, bank.getAccountByAccountId(account.getAccountId()));
 	}
 
 	@After

@@ -18,51 +18,52 @@ public class ConstructorMethodTest {
 	private static final String PHONE_NUMBER = "987654321";
 	private static final String NIF = "123456789";
 	private static final String LAST_NAME = "Silva";
-	private static final String FIRST_NAME = "AntÃ³nio";
+	private static final String FIRST_NAME = "António";
 	private static final int AGE = 33;
+	String[] personalInfo = new String[] {FIRST_NAME, LAST_NAME, ADDRESS};
 
 	private Bank bank;
 
 	@Before
 	public void setUp() throws BankException {
-		this.bank = new Bank("CGD");
+		bank = new Bank("CGD");
 	}
 
 	@Test
 	public void success() throws ClientException {
-		Client client = new Client(this.bank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, AGE);
+		Client client = new Client(bank, personalInfo, NIF, PHONE_NUMBER, AGE);
 
-		assertEquals(this.bank, client.getBank());
+		assertEquals(bank, client.getBank());
 		assertEquals(FIRST_NAME, client.getFirstName());
 		assertEquals(LAST_NAME, client.getLastName());
 		assertEquals(NIF, client.getNif());
 		assertEquals(PHONE_NUMBER, client.getPhoneNumber());
 		assertEquals(ADDRESS, client.getAddress());
-		assertTrue(this.bank.isClientOfBank(client));
+		assertTrue(bank.isClientOfBank(client));
 	}
 
 	@Test(expected = ClientException.class)
 	public void negativeAge() throws ClientException {
-		new Client(this.bank, FIRST_NAME, LAST_NAME, "12345678A", PHONE_NUMBER, ADDRESS, -1);
+		new Client(bank, personalInfo, "12345678A", PHONE_NUMBER, -1);
 	}
 
 	@Test(expected = ClientException.class)
 	public void no9DigitsNif() throws ClientException {
-		new Client(this.bank, FIRST_NAME, LAST_NAME, "12345678A", PHONE_NUMBER, ADDRESS, AGE);
+		new Client(bank, personalInfo, "12345678A", PHONE_NUMBER, AGE);
 	}
 
 	@Test(expected = ClientException.class)
 	public void no9DigitsPhoneNumber() throws ClientException {
-		new Client(this.bank, FIRST_NAME, LAST_NAME, NIF, "A87654321", ADDRESS, AGE);
+		new Client(bank, personalInfo, NIF, "A87654321", AGE);
 	}
 
 	public void twoClientsSameNif() throws ClientException {
-		new Client(this.bank, FIRST_NAME, LAST_NAME, NIF, "A87654321", ADDRESS, AGE);
+		new Client(bank, personalInfo, NIF, "A87654321", AGE);
 		try {
-			new Client(this.bank, FIRST_NAME, LAST_NAME, NIF, "A87654321", ADDRESS, AGE);
+			new Client(bank, personalInfo, NIF, "A87654321", AGE);
 			fail();
 		} catch (ClientException e) {
-			assertEquals(1, this.bank.getTotalNumberOfClients());
+			assertEquals(1, bank.getTotalNumberOfClients());
 		}
 	}
 

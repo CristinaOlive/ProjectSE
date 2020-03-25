@@ -24,33 +24,33 @@ public class HappyBirthdayMethodTest {
 
 	@Before
 	public void setUp() throws AccountException, ClientException, BankException {
-		this.services = new Services();
-		this.bank = new Bank("CGD");
+		services = new Services();
+		bank = new Bank("CGD");
+		String[] personalInfo = new String[] {"José", "Manuel", "Street"};
+		youngClient = new Client(bank, personalInfo, "123456780", "987654321", 16);
 
-		this.youngClient = new Client(this.bank, "JosÃ©", "Manuel", "123456780", "987654321", "Street", 16);
-
-		this.young = (YoungAccount) this.services
-				.getAccountByIban(this.bank.createAccount(Bank.AccountType.YOUNG, this.youngClient, 100, 0));
-		this.bank.createAccount(Bank.AccountType.YOUNG, this.youngClient, 100, 0);
-		this.bank.createAccount(Bank.AccountType.YOUNG, this.youngClient, 100, 0);
-		this.bank.createAccount(Bank.AccountType.YOUNG, this.youngClient, 100, 0);
+		young = (YoungAccount) services
+				.getAccountByIban(bank.createAccount(Bank.AccountType.YOUNG, youngClient, 100, 0));
+		bank.createAccount(Bank.AccountType.YOUNG, youngClient, 100, 0);
+		bank.createAccount(Bank.AccountType.YOUNG, youngClient, 100, 0);
+		bank.createAccount(Bank.AccountType.YOUNG, youngClient, 100, 0);
 	}
 
 	@Test
 	public void successNoUpgrade() throws BankException, AccountException, ClientException {
-		this.youngClient.happyBirthDay();
+		youngClient.happyBirthDay();
 
-		assertEquals(17, this.youngClient.getAge());
-		assertTrue(this.youngClient.getAccounts().allMatch(a -> a instanceof YoungAccount));
+		assertEquals(17, youngClient.getAge());
+		assertTrue(youngClient.getAccounts().allMatch(a -> a instanceof YoungAccount));
 	}
 
 	@Test
 	public void successUpGrade() throws BankException, AccountException, ClientException {
-		this.youngClient.happyBirthDay();
-		this.youngClient.happyBirthDay();
+		youngClient.happyBirthDay();
+		youngClient.happyBirthDay();
 
-		assertEquals(18, this.youngClient.getAge());
-		assertTrue(this.youngClient.getAccounts().allMatch(a -> a instanceof CheckingAccount));
+		assertEquals(18, youngClient.getAge());
+		assertTrue(youngClient.getAccounts().allMatch(a -> a instanceof CheckingAccount));
 	}
 
 	@After

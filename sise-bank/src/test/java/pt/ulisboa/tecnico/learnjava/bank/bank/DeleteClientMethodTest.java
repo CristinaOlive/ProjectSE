@@ -18,37 +18,38 @@ public class DeleteClientMethodTest {
 	private static final String NIF = "123456789";
 	private static final String LAST_NAME = "Silva";
 	private static final String FIRST_NAME = "António";
+	String[] personalInfo = new String[] {FIRST_NAME, LAST_NAME, ADDRESS};
 
 	private Bank bank;
 	private Client client;
 
 	@Before
 	public void setUp() throws BankException, ClientException {
-		this.bank = new Bank("CGD");
-		this.client = new Client(this.bank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 33);
+		bank = new Bank("CGD");
+		client = new Client(bank, personalInfo, NIF, PHONE_NUMBER, 33);
 	}
 
 	@Test
 	public void success() throws BankException, AccountException {
-		this.bank.deleteClient(NIF);
+		bank.deleteClient(NIF);
 
-		assertEquals(0, this.bank.getTotalNumberOfClients());
+		assertEquals(0, bank.getTotalNumberOfClients());
 	}
 
 	@Test
 	public void successClientWithAccounts() throws BankException, AccountException, ClientException {
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
-		this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
+		bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
 
-		this.bank.deleteClient(NIF);
+		bank.deleteClient(NIF);
 
-		assertEquals(0, this.bank.getTotalNumberOfClients());
-		assertEquals(0, this.bank.getTotalNumberOfAccounts());
+		assertEquals(0, bank.getTotalNumberOfClients());
+		assertEquals(0, bank.getTotalNumberOfAccounts());
 	}
 
 	@Test(expected = BankException.class)
 	public void noClientForNif() throws BankException, AccountException {
-		this.bank.deleteClient("123456780");
+		bank.deleteClient("123456780");
 	}
 
 	@After

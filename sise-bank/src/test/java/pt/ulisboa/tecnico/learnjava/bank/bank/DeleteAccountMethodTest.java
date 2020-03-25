@@ -20,7 +20,8 @@ public class DeleteAccountMethodTest {
 	private static final String PHONE_NUMBER = "987654321";
 	private static final String NIF = "123456789";
 	private static final String LAST_NAME = "Silva";
-	private static final String FIRST_NAME = "AntÃ³nio";
+	private static final String FIRST_NAME = "António";
+	String[] personalInfo = new String[] {FIRST_NAME, LAST_NAME, ADDRESS};
 
 	private Bank bank;
 	private Client client;
@@ -29,19 +30,19 @@ public class DeleteAccountMethodTest {
 
 	@Before
 	public void setUp() throws BankException, ClientException, AccountException {
-		this.services = new Services();
-		this.bank = new Bank("CGD");
-		this.client = new Client(this.bank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 33);
-		String iban = this.bank.createAccount(Bank.AccountType.CHECKING, this.client, 100, 0);
-		this.account = this.services.getAccountByIban(iban);
+		services = new Services();
+		bank = new Bank("CGD");
+		client = new Client(bank, personalInfo, NIF, PHONE_NUMBER, 33);
+		String iban = bank.createAccount(Bank.AccountType.CHECKING, client, 100, 0);
+		account = services.getAccountByIban(iban);
 	}
 
 	@Test
 	public void success() throws BankException, AccountException {
-		this.bank.deleteAccount(this.account);
+		bank.deleteAccount(account);
 
-		assertEquals(0, this.bank.getTotalNumberOfAccounts());
-		assertFalse(this.client.hasAccount(this.account));
+		assertEquals(0, bank.getTotalNumberOfAccounts());
+		assertFalse(client.hasAccount(account));
 	}
 
 	@After

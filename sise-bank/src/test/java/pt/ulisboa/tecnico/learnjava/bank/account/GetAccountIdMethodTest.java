@@ -26,27 +26,27 @@ public class GetAccountIdMethodTest {
 	@Before
 	public void setUp() throws AccountException, ClientException, BankException {
 		Bank bank = new Bank("CGD");
+		String[] personalInfo = new String[] {"José", "Manuel", "Street"};
+		Client client = new Client(bank, personalInfo, "123456789", "987654321", 33);
 
-		Client client = new Client(bank, "JosÃ©", "Manuel", "123456789", "987654321", "Street", 33);
-
-		this.checking = new CheckingAccount(client, 100);
-		this.savings = new SavingsAccount(client, 100, 10);
-		this.salary = new SalaryAccount(client, 100, 1000);
+		checking = new CheckingAccount(client, 100);
+		savings = new SavingsAccount(client, 100, 10);
+		salary = new SalaryAccount(client, 100, 1000);
 	}
 
 	@Test
 	public void successForCheckingAccount() {
-		assertTrue(this.checking.getAccountId().startsWith(AccountType.CHECKING.getPrefix()));
+		assertTrue(checking.getAccountId().startsWith(AccountType.CHECKING.getPrefix()));
 	}
 
 	@Test
 	public void successForSavingsAccount() {
-		assertTrue(this.savings.getAccountId().startsWith(AccountType.SAVINGS.getPrefix()));
+		assertTrue(savings.getAccountId().startsWith(AccountType.SAVINGS.getPrefix()));
 	}
 
 	@Test
 	public void successForSalaryAccount() {
-		assertTrue(this.salary.getAccountId().startsWith(AccountType.SALARY.getPrefix()));
+		assertTrue(salary.getAccountId().startsWith(AccountType.SALARY.getPrefix()));
 	}
 
 	@After
