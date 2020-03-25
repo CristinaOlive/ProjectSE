@@ -30,33 +30,34 @@ public class TransferMethodTest {
 	private Client sourceClient;
 	private Client targetClient;
 	private Services services;
+	private final String[] personalInfo = { FIRST_NAME, LAST_NAME, PHONE_NUMBER };
 
 	@Before
 	public void setUp() throws BankException, AccountException, ClientException {
-		services = new Services();
-		sibs = new Sibs(100, services);
-		sourceBank = new Bank("CGD");
-		targetBank = new Bank("BPI");
-		sourceClient = new Client(sourceBank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 33);
-		targetClient = new Client(targetBank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 22);
+		this.services = new Services();
+		this.sibs = new Sibs(100, this.services);
+		this.sourceBank = new Bank("CGD");
+		this.targetBank = new Bank("BPI");
+		this.sourceClient = new Client(this.sourceBank, this.personalInfo, NIF, PHONE_NUMBER, 33);
+		this.targetClient = new Client(this.targetBank, this.personalInfo, NIF, PHONE_NUMBER, 22);
 	}
 
 	@Test
 	public void success() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
 
-		sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.transfer(sourceIban, targetIban, 100);
 
-		sibs.processOperation();
-		sibs.processOperation();
-		sibs.processOperation();
-		assertEquals(889, services.getAccountByIban(sourceIban).getBalance());
-		assertEquals(1100, services.getAccountByIban(targetIban).getBalance());
-		assertEquals(1, sibs.getNumberOfOperations());
-		assertEquals(100, sibs.getTotalValueOfOperations());
-		assertEquals(100, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_TRANSFER));
-		assertEquals(0, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_PAYMENT));
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		assertEquals(889, this.services.getAccountByIban(sourceIban).getBalance());
+		assertEquals(1100, this.services.getAccountByIban(targetIban).getBalance());
+		assertEquals(1, this.sibs.getNumberOfOperations());
+		assertEquals(100, this.sibs.getTotalValueOfOperations());
+		assertEquals(100, this.sibs.getTotalValueOfOperationsForType(Operation.OPERATION_TRANSFER));
+		assertEquals(0, this.sibs.getTotalValueOfOperationsForType(Operation.OPERATION_PAYMENT));
 	}
 
 	@After

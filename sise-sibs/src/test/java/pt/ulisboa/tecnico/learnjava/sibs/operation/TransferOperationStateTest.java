@@ -33,102 +33,103 @@ public class TransferOperationStateTest {
 	private Services services;
 	String SOURCE_IBAN;
 	String TARGET_IBAN;
+	String[] personalInfo = { FIRST_NAME, LAST_NAME, PHONE_NUMBER };
 	int VALUE = 100;
 
 	@Before
 	public void setUp() throws BankException, AccountException, ClientException {
-		services = new Services();
-		sibs = new Sibs(100, services);
-		sourceBank = new Bank("CGD");
-		targetBank = new Bank("BPI");
-		sourceClient = new Client(sourceBank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 33);
-		targetClient = new Client(targetBank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 22);
-		SOURCE_IBAN = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		TARGET_IBAN = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
+		this.services = new Services();
+		this.sibs = new Sibs(100, this.services);
+		this.sourceBank = new Bank("CGD");
+		this.targetBank = new Bank("BPI");
+		this.sourceClient = new Client(this.sourceBank, this.personalInfo, NIF, PHONE_NUMBER, 33);
+		this.targetClient = new Client(this.targetBank, this.personalInfo, NIF, PHONE_NUMBER, 22);
+		this.SOURCE_IBAN = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		this.TARGET_IBAN = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
 	}
 
 	@Test
 	public void successRegistered() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("registered", operation.getState());
 		assertEquals(100, operation.getValue());
-		assertEquals(SOURCE_IBAN, operation.getSourceIban());
-		assertEquals(TARGET_IBAN, operation.getTargetIban());
+		assertEquals(this.SOURCE_IBAN, operation.getSourceIban());
+		assertEquals(this.TARGET_IBAN, operation.getTargetIban());
 	}
 
 	@Test
 	public void successWithdrawn() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals("registered", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("deposited", operation.getState());
 		assertEquals(100, operation.getValue());
-		assertEquals(SOURCE_IBAN, operation.getSourceIban());
-		assertEquals(TARGET_IBAN, operation.getTargetIban());
+		assertEquals(this.SOURCE_IBAN, operation.getSourceIban());
+		assertEquals(this.TARGET_IBAN, operation.getTargetIban());
 	}
 
 	@Test
-	public void successCompleted() throws OperationException, AccountException, BankException, ClientException, SibsException {
+	public void successCompleted()
+			throws OperationException, AccountException, BankException, ClientException, SibsException {
 		String NIF2 = "123456799";
-		String LAST = "Costa";
-		String FIRST = "Manuel";
-		Client targetClient2 = new Client(sourceBank, FIRST, LAST, NIF2, PHONE_NUMBER, ADDRESS, 22);
-		String targetIban = sourceBank.createAccount(Bank.AccountType.CHECKING, targetClient2, 1000, 0);
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, targetIban, VALUE);
+		String[] personalInfo = { "Manuel", "Costa", ADDRESS };
+		Client targetClient2 = new Client(this.sourceBank, personalInfo, NIF2, PHONE_NUMBER, 22);
+		String targetIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, targetClient2, 1000, 0);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, targetIban, this.VALUE);
 		assertEquals("registered", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("deposited", operation.getState());
 
-		operation.Process(services);
-		operation.Process(services);
+		operation.Process(this.services);
+		operation.Process(this.services);
 		assertEquals("completed", operation.getState());
 	}
 
 	@Test
 	public void successDeposited() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals("registered", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("deposited", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals("withdrawn", operation.getState());
 
 	}
 
 	@Test
 	public void successDepositedCompleted() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals("registered", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("deposited", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals("withdrawn", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals("completed", operation.getState());
 	}
 
 	@Test
 	public void successDepositedCancel() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals("registered", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("deposited", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals("withdrawn", operation.getState());
 
 		operation.cancel();
@@ -137,10 +138,10 @@ public class TransferOperationStateTest {
 
 	@Test
 	public void successWithdrawnCancel() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals("registered", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("deposited", operation.getState());
 
@@ -150,7 +151,7 @@ public class TransferOperationStateTest {
 
 	@Test
 	public void successRegisteredCancel() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals("registered", operation.getState());
 
 		operation.cancel();
@@ -159,17 +160,17 @@ public class TransferOperationStateTest {
 
 	@Test
 	public void successDepositedCompletedNoCancel() throws OperationException, AccountException, SibsException {
-		TransferOperation operation = new TransferOperation(SOURCE_IBAN, TARGET_IBAN, VALUE);
+		TransferOperation operation = new TransferOperation(this.SOURCE_IBAN, this.TARGET_IBAN, this.VALUE);
 		assertEquals("registered", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals(Operation.OPERATION_TRANSFER, operation.getType());
 		assertEquals("deposited", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals("withdrawn", operation.getState());
 
-		operation.Process(services);
+		operation.Process(this.services);
 		assertEquals("completed", operation.getState());
 
 		operation.cancel();

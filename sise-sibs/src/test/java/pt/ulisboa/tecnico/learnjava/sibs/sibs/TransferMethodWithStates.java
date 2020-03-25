@@ -31,145 +31,155 @@ public class TransferMethodWithStates {
 	private Client sourceClient;
 	private Client targetClient;
 	private Services services;
+	private final String[] personalInfo = { FIRST_NAME, LAST_NAME, PHONE_NUMBER };
 
 	@Before
 	public void setUp() throws BankException, AccountException, ClientException {
-		services = new Services();
-		sibs = new Sibs(100, services);
-		sourceBank = new Bank("CGD");
-		targetBank = new Bank("BPI");
-		sourceClient = new Client(sourceBank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 33);
-		targetClient = new Client(targetBank, FIRST_NAME, LAST_NAME, NIF, PHONE_NUMBER, ADDRESS, 22);
+		this.services = new Services();
+		this.sibs = new Sibs(100, this.services);
+		this.sourceBank = new Bank("CGD");
+		this.targetBank = new Bank("BPI");
+		this.sourceClient = new Client(this.sourceBank, this.personalInfo, NIF, PHONE_NUMBER, 33);
+		this.targetClient = new Client(this.targetBank, this.personalInfo, NIF, PHONE_NUMBER, 22);
 	}
 
 	@Test
-	public void successCompleted() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
+	public void successCompleted()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
 
-		sibs.transfer(sourceIban, targetIban, 100);
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
-		sibs.processOperation();
-		sibs.processOperation();
-		sibs.processOperation();
-		assertEquals(889, services.getAccountByIban(sourceIban).getBalance());
-		assertEquals(1100, services.getAccountByIban(targetIban).getBalance());
-		assertEquals(1, sibs.getNumberOfOperations());
-		assertEquals(100, sibs.getTotalValueOfOperations());
-		assertEquals(100, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_TRANSFER));
-		assertEquals(0, sibs.getTotalValueOfOperationsForType(Operation.OPERATION_PAYMENT));
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		assertEquals(889, this.services.getAccountByIban(sourceIban).getBalance());
+		assertEquals(1100, this.services.getAccountByIban(targetIban).getBalance());
+		assertEquals(1, this.sibs.getNumberOfOperations());
+		assertEquals(100, this.sibs.getTotalValueOfOperations());
+		assertEquals(100, this.sibs.getTotalValueOfOperationsForType(Operation.OPERATION_TRANSFER));
+		assertEquals(0, this.sibs.getTotalValueOfOperationsForType(Operation.OPERATION_PAYMENT));
 		assertEquals("completed", op.getState());
 	}
 
 	@Test
-	public void successRegistered() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successRegistered()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("registered", op.getState());
 	}
 
 	@Test
-	public void successDeposited() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		sibs.transfer(sourceIban, targetIban, 200);
-		sibs.transfer(sourceIban, targetIban, 400);
-		sibs.processOperation();
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successDeposited()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.transfer(sourceIban, targetIban, 200);
+		this.sibs.transfer(sourceIban, targetIban, 400);
+		this.sibs.processOperation();
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("deposited", op.getState());
-		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		TransferOperation op2 = (TransferOperation) this.sibs.getOperation(1);
 		assertEquals("deposited", op2.getState());
-		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		TransferOperation op3 = (TransferOperation) this.sibs.getOperation(2);
 		assertEquals("deposited", op3.getState());
-		assertEquals(3, sibs.getNumberOfOperations());
+		assertEquals(3, this.sibs.getNumberOfOperations());
 	}
 
 	@Test
-	public void successMultipleCompleted() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		sibs.transfer(sourceIban, targetIban, 200);
-		sibs.transfer(sourceIban, targetIban, 400);
-		sibs.processOperation();
-		sibs.processOperation();
-		sibs.processOperation();
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successMultipleCompleted()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.transfer(sourceIban, targetIban, 200);
+		this.sibs.transfer(sourceIban, targetIban, 400);
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("completed", op.getState());
-		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		TransferOperation op2 = (TransferOperation) this.sibs.getOperation(1);
 		assertEquals("completed", op2.getState());
-		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		TransferOperation op3 = (TransferOperation) this.sibs.getOperation(2);
 		assertEquals("completed", op3.getState());
-		assertEquals(3, sibs.getNumberOfOperations());
+		assertEquals(3, this.sibs.getNumberOfOperations());
 	}
 
 	@Test
-	public void successProcessWithdraw() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		sibs.transfer(sourceIban, targetIban, 200);
-		sibs.transfer(sourceIban, targetIban, 400);
-		sibs.processOperation();
-		sibs.processOperation();
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successProcessWithdraw()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.transfer(sourceIban, targetIban, 200);
+		this.sibs.transfer(sourceIban, targetIban, 400);
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("withdrawn", op.getState());
-		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		TransferOperation op2 = (TransferOperation) this.sibs.getOperation(1);
 		assertEquals("withdrawn", op2.getState());
-		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		TransferOperation op3 = (TransferOperation) this.sibs.getOperation(2);
 		assertEquals("withdrawn", op3.getState());
-		assertEquals(3, sibs.getNumberOfOperations());
+		assertEquals(3, this.sibs.getNumberOfOperations());
 	}
 
 	@Test
-	public void successProcessRegistered() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		sibs.transfer(sourceIban, targetIban, 200);
-		sibs.transfer(sourceIban, targetIban, 400);
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successProcessRegistered()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.transfer(sourceIban, targetIban, 200);
+		this.sibs.transfer(sourceIban, targetIban, 400);
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("registered", op.getState());
-		TransferOperation op2 = (TransferOperation) sibs.getOperation(1);
+		TransferOperation op2 = (TransferOperation) this.sibs.getOperation(1);
 		assertEquals("registered", op2.getState());
-		TransferOperation op3 = (TransferOperation) sibs.getOperation(2);
+		TransferOperation op3 = (TransferOperation) this.sibs.getOperation(2);
 		assertEquals("registered", op3.getState());
-		assertEquals(3, sibs.getNumberOfOperations());
+		assertEquals(3, this.sibs.getNumberOfOperations());
 	}
 
 	@Test
-	public void successProcessCancelled() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		sibs.cancelOperation(0);
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successProcessCancelled()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.cancelOperation(0);
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("cancelled", op.getState());
 	}
 
 	@Test
-	public void successProcessCancelledDeposited() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		sibs.processOperation();
-		sibs.cancelOperation(0);
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successProcessCancelledDeposited()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.processOperation();
+		this.sibs.cancelOperation(0);
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("cancelled", op.getState());
 	}
 
 	@Test
-	public void successProcessCancelledWithdrawn() throws BankException, AccountException, SibsException, OperationException, ClientException {
-		String sourceIban = sourceBank.createAccount(Bank.AccountType.CHECKING, sourceClient, 1000, 0);
-		String targetIban = targetBank.createAccount(Bank.AccountType.CHECKING, targetClient, 1000, 0);
-		sibs.transfer(sourceIban, targetIban, 100);
-		sibs.processOperation();
-		sibs.processOperation();
-		sibs.cancelOperation(0);
-		TransferOperation op = (TransferOperation) sibs.getOperation(0);
+	public void successProcessCancelledWithdrawn()
+			throws BankException, AccountException, SibsException, OperationException, ClientException {
+		String sourceIban = this.sourceBank.createAccount(Bank.AccountType.CHECKING, this.sourceClient, 1000, 0);
+		String targetIban = this.targetBank.createAccount(Bank.AccountType.CHECKING, this.targetClient, 1000, 0);
+		this.sibs.transfer(sourceIban, targetIban, 100);
+		this.sibs.processOperation();
+		this.sibs.processOperation();
+		this.sibs.cancelOperation(0);
+		TransferOperation op = (TransferOperation) this.sibs.getOperation(0);
 		assertEquals("cancelled", op.getState());
 	}
 
