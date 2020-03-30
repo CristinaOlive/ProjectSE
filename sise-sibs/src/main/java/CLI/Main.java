@@ -17,7 +17,7 @@ public class Main {
 	public static void main(String[] args) throws SibsException, AccountException, OperationException,
 			WrongNumberException, CodeConfirmationException, UnregisteredNumberException, OverdraftException {
 
-		MBWay mbway = new MBWay("999", "pt50");
+		MBWay mbway = new MBWay();
 		View view = new View();
 		Controller controler = new Controller(mbway, view);
 		Scanner input = controler.start();

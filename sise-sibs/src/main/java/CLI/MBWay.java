@@ -22,7 +22,7 @@ public class MBWay {
 	private String IBAN;
 	private Services services;
 	private Sibs sibs = new Sibs(100, this.services);
-	private static Map<String, String> MBWay = new HashMap<String, String>(); // MBWAY -> phoneNumber, IBAN
+	private Map<String, String> MBWay = new HashMap<String, String>(); // MBWAY -> phoneNumber, IBAN
 	private Tuple<Integer, MBWay> temp; // code, MBWay
 
 	public MBWay() {
@@ -31,7 +31,7 @@ public class MBWay {
 	public MBWay(String phoneNumber, String IBAN) {
 		this.phoneNumber = phoneNumber;
 		this.IBAN = IBAN;
-		MBWay.put(phoneNumber, IBAN);
+		this.MBWay.put(phoneNumber, IBAN);
 	}
 
 	/*
@@ -50,10 +50,10 @@ public class MBWay {
 	 * style: confirm-mbway <Code>
 	 */
 	public void confirmMBWay(int code) throws CodeConfirmationException {
-		if (!(getTempX() == code)) {
+		if (getTempX() != code) {
 			throw new CodeConfirmationException();
 		}
-		MBWay.put(this.temp.y.phoneNumber, this.temp.y.IBAN);
+		this.MBWay.put(this.temp.y.phoneNumber, this.temp.y.IBAN);
 		this.temp.x = null;
 		this.temp.y = null;
 	}
@@ -65,8 +65,8 @@ public class MBWay {
 	 */
 	public void transferMBWay(String[] numbers, int amount) throws AccountException, OverdraftException,
 			UnregisteredNumberException, SibsException, OperationException {
-		String sourceIBAN = MBWay.get(numbers[0]);
-		String targetIBAN = MBWay.get(numbers[1]);
+		String sourceIBAN = this.MBWay.get(numbers[0]);
+		String targetIBAN = this.MBWay.get(numbers[1]);
 		if (!isNumRegist(numbers[0]) || !isNumRegist(numbers[1])) {
 			throw new UnregisteredNumberException();
 		}
@@ -77,10 +77,10 @@ public class MBWay {
 	}
 
 	/*
-	 * Performs split bill assuming the following instruction correspondence:
+	 * Performs split bill assuming the following instructions correspondence:
 	 * mbway-split-bil <NUMBER_OF_FRIENDS> <AMOUNT> || friend <PHONE_NUMBER>
 	 * <AMOUNT> || friend <PHONE_NUMBER> <AMOUNT> || friend <PHONE_NUMBER> <AMOUNT>
-	 * || (..) || end
+	 * || (...) || end
 	 *
 	 * corresponds to: decisiontest <numberoffriends> <totalbillamount> ||
 	 * decisiontest <billowner/target phone number> <amount to be paid by
@@ -149,7 +149,7 @@ public class MBWay {
 	}
 
 	public boolean isNumRegist(String phoneNumber) {
-		return MBWay.containsKey(phoneNumber);
+		return this.MBWay.containsKey(phoneNumber);
 	}
 
 	public int getBalanceByIBAN(String IBAN) throws AccountException {
@@ -158,7 +158,15 @@ public class MBWay {
 	}
 
 	public String getIBANByPhoneNumber(String phoneNumber) {
-		return MBWay.get(phoneNumber);
+		return this.MBWay.get(phoneNumber);
+	}
+
+	public boolean hasPhoneNumber(String phoneNumber) {
+		return this.MBWay.containsKey(phoneNumber);
+	}
+
+	public Map<String, String> getMBWay() {
+		return this.MBWay;
 	}
 
 }
