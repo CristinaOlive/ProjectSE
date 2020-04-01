@@ -43,10 +43,10 @@ public class TransferOperation extends Operation {
 				return stateTransfer;
 			}
 		} catch (OperationException e) {
-			stateTransfer = state.retry();
-			if(stateTransfer.equals("retry")) {
+			if(state.retry().equals("retry")) {
 				stateTransfer = Process(services);
 			} else {
+				stateTransfer = "error";
 				throw new OperationException();
 			}
 			return stateTransfer;
